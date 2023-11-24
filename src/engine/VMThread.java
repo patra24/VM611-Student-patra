@@ -1,24 +1,29 @@
 package engine;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import engine.opcodes.Opcode;
 
-/**
- * VMThread executes a list of opcodes.
- */
 public class VMThread {
+    List<Opcode> opcodes;
 
     public VMThread(List<Opcode> opcodes) {
+        this.opcodes = opcodes;
     }
 
-    /**
-     * Runs the opcodes, and returns the resulting local variables.
-     * 
-     * @return the local variables
-     */
     public Map<String, Integer> run() {
-        return null;
+        Stack<Integer> opStack = new Stack<>();
+        Map<String, Integer> locals = new HashMap<>();
+
+        int pc = 0;
+        while (pc < opcodes.size()) {
+            Opcode op = opcodes.get(pc);
+            pc = op.execute(pc, opStack, locals);
+        }
+
+        return locals;
     }
 }
