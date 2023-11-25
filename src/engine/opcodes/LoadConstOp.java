@@ -1,7 +1,8 @@
 package engine.opcodes;
 
-import java.util.Map;
 import java.util.Stack;
+
+import engine.StackFrame;
 
 /**
  * Loads a constant onto the stack.
@@ -14,8 +15,7 @@ public class LoadConstOp implements Opcode {
     }
 
     @Override
-    public int execute(int pc, Stack<Integer> opStack, Map<String, Integer> localVars) {
+    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
         opStack.push(value);
-        return pc + 1;
     }
 }

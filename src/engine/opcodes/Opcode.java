@@ -1,16 +1,15 @@
 package engine.opcodes;
 
-import java.util.Map;
 import java.util.Stack;
+
+import engine.StackFrame;
 
 public interface Opcode {
     /**
      * Executes the opcode.
      *
-     * @param pc        the program counter
+     * @param callStack the call stack
      * @param opStack   the op stack
-     * @param localVars the local variables
-     * @return the next instruction to execute (usually pc + 1)
      */
-    int execute(int pc, Stack<Integer> opStack, Map<String, Integer> localVars);
+    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack);
 }

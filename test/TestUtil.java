@@ -1,15 +1,20 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import engine.CompiledClassCache;
+import engine.Method;
 import engine.VMThread;
 import engine.opcodes.BinaryOp;
 import engine.opcodes.BranchOp;
+import engine.opcodes.CallOp;
 import engine.opcodes.LoadConstOp;
 import engine.opcodes.LoadLocalOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
+import engine.opcodes.ReturnOp;
 import engine.opcodes.StoreLocalOp;
 
 /**
@@ -80,6 +85,14 @@ public class TestUtil {
             return new BranchOp(BranchOp.Type.FALSE, Integer.parseInt(tokens[1]));
         }
 
+        if ("call".equals(opName)) {
+            return new CallOp(tokens[1]);
+        }
+
+        if ("return".equals(opName)) {
+            return new ReturnOp();
+        }
+
         throw new RuntimeException("Unrecognized opcode: " + opName);
     }
 
@@ -91,7 +104,9 @@ public class TestUtil {
      */
     public static Map<String, Integer> testCode(String code) {
         List<Opcode> ops = TestUtil.parseOpcodes(code);
-        VMThread e = new VMThread(ops);
+        Method method = new Method("main", Collections.emptyList(), ops);
+        CompiledClassCache.instance().saveMethod(method);
+        VMThread e = new VMThread("main");
         return e.run();
     }
 }

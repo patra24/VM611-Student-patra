@@ -1,7 +1,8 @@
 package engine.opcodes;
 
-import java.util.Map;
 import java.util.Stack;
+
+import engine.StackFrame;
 
 /**
  * Possibly branches to another location in the code.
@@ -22,14 +23,12 @@ public class BranchOp implements Opcode {
     }
 
     @Override
-    public int execute(int pc, Stack<Integer> opStack, Map<String, Integer> localVars) {
+    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
         if (type == Type.UNCONDITIONAL ||
         // Only one of these pops will happen, because of short-circuiting.
             (type == Type.TRUE && opStack.pop() == 1) ||
             (type == Type.FALSE && opStack.pop() != 1)) {
-            return dest;
+            callStack.peek().jumpTo(dest);
         }
-
-        return pc + 1;
     }
 }

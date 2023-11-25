@@ -3,6 +3,8 @@ package engine.opcodes;
 import java.util.Map;
 import java.util.Stack;
 
+import engine.StackFrame;
+
 /**
  * Loads a local variable onto the stack.
  */
@@ -14,8 +16,8 @@ public class LoadLocalOp implements Opcode {
     }
 
     @Override
-    public int execute(int pc, Stack<Integer> opStack, Map<String, Integer> localVars) {
+    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
+        Map<String, Integer> localVars = callStack.peek().getLocalVars();
         opStack.push(localVars.get(varName));
-        return pc + 1;
     }
 }
