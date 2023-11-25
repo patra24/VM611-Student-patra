@@ -11,6 +11,7 @@ public class ReturnOp implements Opcode {
 
     @Override
     public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
+        callStack.pop();
     }
 
 }
