@@ -1,8 +1,15 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ast.model.ArgumentList;
+import ast.model.AssignStatement;
+import ast.model.BinaryExpression;
 import ast.model.CompoundStatement;
+import ast.model.ConstantExpression;
 import ast.model.Expression;
+import ast.model.ExpressionStatement;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
@@ -10,6 +17,7 @@ import ast.model.ParameterDefinition;
 import ast.model.ParameterList;
 import ast.model.ReturnStatement;
 import ast.model.Statement;
+import ast.model.VariableExpression;
 import ast.model.WhileStatement;
 import engine.opcodes.Operator;
 import types.DataType;
@@ -29,7 +37,12 @@ public class Parser {
     public Operator parseOperator() {
         // operator ::= '+' | '-' | '*' | '/' | '%' | '==' | '!=' | '>' | '>=' | '<' |
         // '<='
-        return null;
+        String opStr = tokens.remove();
+        Operator operator = Operator.fromSymbol(opStr);
+        if (operator == null) {
+            throw new RuntimeException("Unknown operator: " + opStr);
+        }
+        return operator;
     }
 
     /**
@@ -39,7 +52,21 @@ public class Parser {
      */
     public ArgumentList parseArguments() {
         // arguments ::= '(' (expression (',' expression)*)? ')'
-        return null;
+        List<Expression> args = new ArrayList<>();
+
+        tokens.consume("(");
+        if (!tokens.lookahead(")")) {
+            do {
+                args.add(parseExpression());
+
+                if (tokens.lookahead(",")) {
+                    tokens.consume(",");
+                }
+            } while (!tokens.lookahead(")"));
+        }
+
+        tokens.consume(")");
+        return new ArgumentList(args);
     }
 
     /**
@@ -49,7 +76,8 @@ public class Parser {
      */
     public MethodCallExpression parseMethodCallExpression() {
         // method_call_expression ::= identifier arguments
-        return null;
+        String name = tokens.remove();
+        return new MethodCallExpression(name, parseArguments());
     }
 
     /**
@@ -65,7 +93,22 @@ public class Parser {
         //   variable |
         //   constant
         // @formatter:on
-        return null;
+        if (tokens.lookahead("(")) {
+            tokens.consume("(");
+            Expression left = parseExpression();
+            Operator op = parseOperator();
+            Expression right = parseExpression();
+            tokens.consume(")");
+            return new BinaryExpression(left, op, right);
+        } else if (Character.isAlphabetic(tokens.peek().charAt(0))) {
+            if (tokens.lookahead("*", "(")) {
+                return parseMethodCallExpression();
+            } else {
+                return new VariableExpression(tokens.remove());
+            }
+        } else {
+            return new ConstantExpression(Integer.parseInt(tokens.remove()));
+        }
     }
 
     /**
@@ -75,7 +118,17 @@ public class Parser {
      */
     public Statement parseExpressionStatement() {
         // expression_statement ::= (expression '=')? expression ';'
-        return null;
+        Expression first = parseExpression();
+
+        if (tokens.lookahead("=")) {
+            tokens.consume("=");
+            AssignStatement assign = new AssignStatement(first, parseExpression());
+            tokens.consume(";");
+            return assign;
+        } else {
+            tokens.consume(";");
+            return new ExpressionStatement(first);
+        }
     }
 
     /**
@@ -88,7 +141,15 @@ public class Parser {
         // if_statement ::=
         // 'if' expression compound_statement ('else' compound_statement)?
         // @formatter:on
-        return null;
+        tokens.consume("if");
+        Expression condition = parseExpression();
+        Statement thenBlock = parseCompoundStatement();
+        Statement elseBlock = null;
+        if (tokens.lookahead("else")) {
+            tokens.consume("else");
+            elseBlock = parseCompoundStatement();
+        }
+        return new IfStatement(condition, thenBlock, elseBlock);
     }
 
     /**
@@ -98,7 +159,10 @@ public class Parser {
      */
     public WhileStatement parseWhileStatement() {
         // while_statement ::= 'while' expression compound_statement
-        return null;
+        tokens.consume("while");
+        Expression condition = parseExpression();
+        Statement body = parseCompoundStatement();
+        return new WhileStatement(condition, body);
     }
 
     /**
@@ -108,7 +172,13 @@ public class Parser {
      */
     public ReturnStatement parseReturnStatement() {
         // return_statement ::= 'return' expression? ';'
-        return null;
+        tokens.consume("return");
+        Expression returnValue = null;
+        if (!tokens.lookahead(";")) {
+            returnValue = parseExpression();
+        }
+        tokens.consume(";");
+        return new ReturnStatement(returnValue);
     }
 
     /**
@@ -124,7 +194,16 @@ public class Parser {
         //   return_statement |
         //   expression_statement
         // @formatter:on
-        return null;
+        String next = tokens.peek();
+        if ("if".equals(next)) {
+            return parseIfStatement();
+        } else if ("while".equals(next)) {
+            return parseWhileStatement();
+        } else if ("return".equals(next)) {
+            return parseReturnStatement();
+        } else {
+            return parseExpressionStatement();
+        }
     }
 
     /**
@@ -134,7 +213,15 @@ public class Parser {
      */
     public CompoundStatement parseCompoundStatement() {
         // compound_statement ::= '{' simple_statement+ '}'
-        return null;
+        tokens.consume("{");
+
+        List<Statement> statements = new ArrayList<>();
+        while (!tokens.lookahead("}")) {
+            statements.add(parseSimpleStatement());
+        }
+
+        tokens.consume("}");
+        return new CompoundStatement(statements);
     }
 
     /**
@@ -144,7 +231,8 @@ public class Parser {
      */
     public DataType parseDataType() {
         // data_type ::= 'int'
-        return null;
+        tokens.consume("int");
+        return DataType.INT;
     }
 
     /**
@@ -154,7 +242,12 @@ public class Parser {
      */
     public DataType parseReturnType() {
         // return_type ::= 'void' | data_type
-        return null;
+        if (tokens.lookahead("void")) {
+            tokens.consume("void");
+            return DataType.VOID;
+        }
+
+        return parseDataType();
     }
 
     /**
@@ -164,7 +257,9 @@ public class Parser {
      */
     public ParameterDefinition parseParameter() {
         // parameter ::= data_type identifier
-        return null;
+        DataType paramType = parseDataType();
+        String paramName = tokens.remove();
+        return new ParameterDefinition(paramName, paramType);
     }
 
     /**
@@ -174,7 +269,21 @@ public class Parser {
      */
     public ParameterList parseParameters() {
         // parameters ::= '(' (parameter (',' parameter)*)? ')'
-        return null;
+        List<ParameterDefinition> params = new ArrayList<>();
+
+        tokens.consume("(");
+        if (!tokens.lookahead(")")) {
+            do {
+                params.add(parseParameter());
+
+                if (tokens.lookahead(",")) {
+                    tokens.remove();
+                }
+            } while (!tokens.lookahead(")"));
+        }
+
+        tokens.consume(")");
+        return new ParameterList(params);
     }
 
     /**
@@ -184,6 +293,10 @@ public class Parser {
      */
     public MethodDefinition parseMethod() {
         // method ::= return_type identifier parameters compound_statement
-        return null;
+        DataType returnType = parseReturnType();
+        String name = tokens.remove();
+        ParameterList params = parseParameters();
+        CompoundStatement body = parseCompoundStatement();
+        return new MethodDefinition(returnType, name, params, body);
     }
 }
