@@ -5,8 +5,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import ast.model.ParameterDefinition;
 import engine.CompiledClassCache;
-import engine.Method;
+import types.DataType;
+import types.Method;
 
 public class Part02Test extends TestBase {
     /**
@@ -111,7 +113,9 @@ public class Part02Test extends TestBase {
 
         Method addMethod = new Method(
             "sub",
-            List.of("x", "y"),
+            List.of(
+                new ParameterDefinition("x", DataType.INT),
+                new ParameterDefinition("y", DataType.INT)),
             TestUtil.parseOpcodes("""
                 load_local x
                 load_local y
@@ -122,7 +126,9 @@ public class Part02Test extends TestBase {
 
         Method maxMethod = new Method(
             "max",
-            List.of("x", "y"),
+            List.of(
+                new ParameterDefinition("x", DataType.INT),
+                new ParameterDefinition("y", DataType.INT)),
             TestUtil.parseOpcodes("""
                 0: load_local x
                 1: load_local y
@@ -163,7 +169,9 @@ public class Part02Test extends TestBase {
 
         Method addMethod = new Method(
             "add",
-            List.of("x", "y"),
+            List.of(
+                new ParameterDefinition("x", DataType.INT),
+                new ParameterDefinition("y", DataType.INT)),
             TestUtil.parseOpcodes("""
                 load_local x
                 load_local y
@@ -174,7 +182,9 @@ public class Part02Test extends TestBase {
 
         Method fooMethod = new Method(
             "foo",
-            List.of("x", "y"),
+            List.of(
+                new ParameterDefinition("x", DataType.INT),
+                new ParameterDefinition("y", DataType.INT)),
             TestUtil.parseOpcodes("""
                 load_local x
                 load_local y
@@ -202,7 +212,7 @@ public class Part02Test extends TestBase {
 
         Method factorialMethod = new Method(
             "factorial",
-            List.of("x"),
+            List.of(new ParameterDefinition("x", DataType.INT)),
             TestUtil.parseOpcodes("""
                 0: load_local x
                 1: load_const 1
@@ -240,7 +250,7 @@ public class Part02Test extends TestBase {
 
         Method factorialMethod = new Method(
             "fib",
-            List.of("x"),
+            List.of(new ParameterDefinition("x", DataType.INT)),
             TestUtil.parseOpcodes("""
                 0: load_local x
                 1: load_const 2

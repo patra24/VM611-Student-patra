@@ -1,7 +1,8 @@
-package engine;
+package types;
 
 import java.util.List;
 
+import ast.model.ParameterDefinition;
 import engine.opcodes.Opcode;
 
 /**
@@ -10,9 +11,9 @@ import engine.opcodes.Opcode;
 public class Method {
     private String name;
     private List<Opcode> opcodes;
-    private List<String> parameters;
+    private List<ParameterDefinition> parameters;
 
-    public Method(String name, List<String> parameters, List<Opcode> opcodes) {
+    public Method(String name, List<ParameterDefinition> parameters, List<Opcode> opcodes) {
         this.name = name;
         this.parameters = parameters;
         this.opcodes = opcodes;
@@ -26,7 +27,7 @@ public class Method {
         return opcodes;
     }
 
-    public List<String> getParameters() {
+    public List<ParameterDefinition> getParameters() {
         return parameters;
     }
 }

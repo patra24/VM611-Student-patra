@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import engine.opcodes.Opcode;
+import types.Method;
 
 public class VMThread {
     List<Opcode> opcodes;

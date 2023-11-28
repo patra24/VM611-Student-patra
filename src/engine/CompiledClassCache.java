@@ -3,6 +3,8 @@ package engine;
 import java.util.HashMap;
 import java.util.Map;
 
+import types.Method;
+
 /**
  * Singleton cache for compiled code.
  */
