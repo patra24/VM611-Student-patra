@@ -32,6 +32,10 @@ public class BinaryExpression extends Expression {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        leftChild.accept(v);
+        v.visit(this);
+        rightChild.accept(v);
+        v.postVisit(this);
     }
 }

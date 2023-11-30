@@ -18,7 +18,7 @@ public class VariableExpression extends Expression {
 
     @Override
     public void accept(Visitor v) {
-
+        v.visit(this);
     }
 
 }

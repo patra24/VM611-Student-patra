@@ -34,6 +34,16 @@ public class IfStatement extends Statement {
 
     @Override
     public void accept(Visitor v) {
+        v.preVisit(this);
+        condition.accept(v);
+        v.preThenVisit(this);
+        thenBlock.accept(v);
 
+        if (elseBlock != null) {
+            v.preElseVisit(this);
+            elseBlock.accept(v);
+        }
+
+        v.postVisit(this);
     }
 }

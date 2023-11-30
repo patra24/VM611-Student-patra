@@ -8,8 +8,8 @@ import ast.visitors.Visitor;
 public class ExpressionStatement extends Statement {
     private Expression expression;
 
-    public ExpressionStatement(Expression expr) {
-        this.expression = expr;
+    public ExpressionStatement(Expression expression) {
+        this.expression = expression;
     }
 
     public Expression getExpression() {
@@ -18,7 +18,8 @@ public class ExpressionStatement extends Statement {
 
     @Override
     public void accept(Visitor v) {
-
+        expression.accept(v);
+        v.postVisit(this);
     }
 
 }

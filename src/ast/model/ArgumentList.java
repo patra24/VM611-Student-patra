@@ -17,7 +17,15 @@ public class ArgumentList extends ArrayList<Expression> implements Visitable {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        for (int i = 0; i < size(); i++) {
+            Expression a = get(i);
+            if (i > 0) {
+                v.betweenArgumentVisit(this);
+            }
+            a.accept(v);
+        }
+        v.postVisit(this);
     }
 
 }

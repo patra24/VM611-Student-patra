@@ -40,7 +40,11 @@ public class MethodDefinition implements Visitable {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        parameters.accept(v);
+        v.preBodyVisit(this);
+        body.accept(v);
+        v.postVisit(this);
     }
 
 }

@@ -30,6 +30,10 @@ public class AssignStatement extends Statement {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        value.accept(v);
+        v.visit(this);
+        lValue.accept(v);
+        v.postVisit(this);
     }
 }

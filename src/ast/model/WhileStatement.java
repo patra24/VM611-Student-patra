@@ -25,7 +25,11 @@ public class WhileStatement extends Statement {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        condition.accept(v);
+        v.preBodyVisit(this);
+        body.accept(v);
+        v.postVisit(this);
     }
 
 }

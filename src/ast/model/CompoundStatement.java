@@ -20,7 +20,11 @@ public class CompoundStatement extends Statement {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        for (Statement stmt : body) {
+            stmt.accept(v);
+        }
+        v.postVisit(this);
     }
 
 }

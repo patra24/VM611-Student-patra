@@ -18,7 +18,11 @@ public class ReturnStatement extends Statement {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        if (returnValue != null) {
+            returnValue.accept(v);
+        }
+        v.postVisit(this);
     }
 
 }

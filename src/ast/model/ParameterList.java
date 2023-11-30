@@ -17,7 +17,15 @@ public class ParameterList extends ArrayList<ParameterDefinition> implements Vis
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        for (int i = 0; i < size(); i++) {
+            ParameterDefinition a = get(i);
+            if (i > 0) {
+                v.betweenParameterVisit(this);
+            }
+            a.accept(v);
+        }
+        v.postVisit(this);
     }
 
 }

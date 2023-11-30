@@ -24,7 +24,9 @@ public class MethodCallExpression extends Expression {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        arguments.accept(v);
+        v.postVisit(this);
     }
 
 }
