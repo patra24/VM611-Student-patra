@@ -2,6 +2,8 @@ package ast.model;
 
 import java.util.List;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents a compound statement.
  */
@@ -14,6 +16,11 @@ public class CompoundStatement extends Statement {
 
     public List<Statement> getBody() {
         return body;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 
 }

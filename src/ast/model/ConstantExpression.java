@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents a constant.
  */
@@ -12,5 +14,10 @@ public class ConstantExpression extends Expression {
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 }

@@ -1,11 +1,13 @@
 package ast.model;
 
+import ast.visitors.Visitable;
+import ast.visitors.Visitor;
 import types.DataType;
 
 /**
  * Represents a method definition.
  */
-public class MethodDefinition {
+public class MethodDefinition implements Visitable {
     private String name;
     private DataType returnType;
     private ParameterList parameters;
@@ -34,6 +36,11 @@ public class MethodDefinition {
 
     public CompoundStatement getBody() {
         return body;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 
 }

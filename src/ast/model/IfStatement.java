@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents an if statement.
  */
@@ -28,5 +30,10 @@ public class IfStatement extends Statement {
 
     public Statement getElseBlock() {
         return elseBlock;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 }

@@ -7,7 +7,7 @@ import engine.StackFrame;
 /**
  * Possibly branches to another location in the code.
  */
-public class BranchOp implements Opcode {
+public class BranchOp extends Opcode {
     public enum Type {
         UNCONDITIONAL,
         TRUE,
@@ -30,5 +30,17 @@ public class BranchOp implements Opcode {
             (type == Type.FALSE && opStack.pop() != 1)) {
             callStack.peek().jumpTo(dest);
         }
+    }
+
+    @Override
+    public String toString() {
+        String branchInstruction;
+        switch (type) {
+        case UNCONDITIONAL -> branchInstruction = "branch";
+        case TRUE -> branchInstruction = "branchT";
+        case FALSE -> branchInstruction = "branchF";
+        default -> throw new RuntimeException("Unknown branch type: " + type);
+        }
+        return branchInstruction + " " + dest;
     }
 }

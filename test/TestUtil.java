@@ -1,4 +1,5 @@
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,20 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import ast.model.AssignStatement;
-import ast.model.BinaryExpression;
-import ast.model.CompoundStatement;
-import ast.model.ConstantExpression;
-import ast.model.Expression;
-import ast.model.ExpressionStatement;
-import ast.model.IfStatement;
-import ast.model.MethodCallExpression;
-import ast.model.MethodDefinition;
-import ast.model.ParameterDefinition;
-import ast.model.ReturnStatement;
-import ast.model.Statement;
-import ast.model.VariableExpression;
-import ast.model.WhileStatement;
+import ast.visitors.CompileVisitor;
+import ast.visitors.PrintVisitor;
+import ast.visitors.Visitable;
 import engine.CompiledClassCache;
 import engine.VMThread;
 import engine.opcodes.BinaryOp;
@@ -126,92 +116,71 @@ public class TestUtil {
         return e.run();
     }
 
-    private static void printAST(Object root, StringBuilder sb, String indentation) {
-        switch (root) {
-        case ConstantExpression e -> sb.append(e.getValue());
-        case VariableExpression e -> sb.append(e.getName());
-        case BinaryExpression e -> {
-            sb.append('(');
-            printAST(e.getLeftChild(), sb, indentation);
-            sb.append(' ').append(e.getOperator()).append(' ');
-            printAST(e.getRightChild(), sb, indentation);
-            sb.append(')');
-        }
-        case AssignStatement s -> {
-            sb.append(indentation);
-            printAST(s.getLValue(), sb, indentation);
-            sb.append(" = ");
-            printAST(s.getValue(), sb, indentation);
-            sb.append(";\n");
-        }
-        case CompoundStatement s -> {
-            sb.append(" {\n");
-            for (Statement st : s.getBody()) {
-                printAST(st, sb, indentation + "  ");
-            }
-            sb.append(indentation).append("}");
-        }
-        case WhileStatement s -> {
-            sb.append(indentation).append("while ");
-            printAST(s.getCondition(), sb, indentation);
-            printAST(s.getBody(), sb, indentation);
-            sb.append('\n');
-        }
-        case IfStatement s -> {
-            sb.append(indentation).append("if ");
-            printAST(s.getCondition(), sb, indentation);
-            printAST(s.getThenBlock(), sb, indentation);
-            Statement elseBlock = s.getElseBlock();
-            if (elseBlock != null) {
-                sb.append(" else");
-                printAST(elseBlock, sb, indentation);
-            }
-            sb.append('\n');
-        }
-        case ReturnStatement s -> {
-            sb.append(indentation).append("return");
-            Expression val = s.getReturnValue();
-            if (val != null) {
-                sb.append(' ');
-                printAST(val, sb, indentation);
-            }
-            sb.append(";\n");
-        }
-        case ArrayList<?> l -> {
-            sb.append('(');
-            for (int i = 0; i < l.size(); i++) {
-                printAST(l.get(i), sb, indentation);
-                if (i < l.size() - 1) {
-                    sb.append(", ");
-                }
-            }
-            sb.append(')');
-        }
-        case MethodCallExpression e -> {
-            sb.append(e.getMethodName());
-            printAST(e.getArguments(), sb, indentation);
-        }
-        case ExpressionStatement s -> {
-            sb.append(indentation);
-            printAST(s.getExpression(), sb, indentation);
-            sb.append(";\n");
-        }
-        case ParameterDefinition p -> {
-            sb.append(p.getType()).append(' ').append(p.getName());
-        }
-        case MethodDefinition m -> {
-            sb.append(indentation).append(m.getReturnType()).append(' ').append(m.getName());
-            printAST(m.getParameters(), sb, indentation);
-            printAST(m.getBody(), sb, indentation);
-            sb.append('\n');
-        }
-        default -> throw new RuntimeException("Unknown type: " + root);
-        }
+    public static void testPrintAST(Visitable root, String expectedCode) {
+        PrintVisitor pv = new PrintVisitor();
+        root.accept(pv);
+        assertEquals("AST incorrect", expectedCode, pv.getResult());
     }
 
-    public static void testPrintAST(Object root, String expectedCode) {
-        StringBuilder sb = new StringBuilder(500);
-        printAST(root, sb, "");
-        assertEquals("AST incorrect", expectedCode, sb.toString());
+    /**
+     * Turns opcodes back into VM assembly instructions.
+     *
+     * @param opcodes the opcodes
+     * @return the disassembly
+     */
+    public static String disassemble(List<Opcode> opcodes) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < opcodes.size(); i++) {
+            Opcode op = opcodes.get(i);
+            sb.append(i).append(": ").append(op).append('\n');
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Adds line numbers to the supplied code, if they're not already present.
+     *
+     * @param code the code
+     * @return the code with line numbers
+     */
+    private static String addLineNumbers(String code) {
+        String[] lines = code.split("\n");
+        if (lines[0].indexOf(":") >= 0) {
+            return code;
+        }
+        for (int i = 0; i < lines.length; i++) {
+            lines[i] = i + ": " + lines[i];
+        }
+        return String.join("\n", lines) + "\n";
+    }
+
+    /**
+     * Runs the CompileVisitor over the supplied AST, and checks the disassembly.
+     *
+     * @param root                the AST
+     * @param expectedDisassembly the expected disassembly
+     */
+    public static void testCompileAST(Visitable root, String expectedDisassembly) {
+        CompileVisitor v = new CompileVisitor();
+        root.accept(v);
+        String actualDisassembly = TestUtil.disassemble(v.getOpcodes());
+        expectedDisassembly = TestUtil.addLineNumbers(expectedDisassembly);
+        assertEquals("generated code incorrect", expectedDisassembly, actualDisassembly);
+    }
+
+    /**
+     * Gets a method from the CompiledClassCache, and checks its disassembly.
+     *
+     * @param methodName          the method name
+     * @param expectedDisassembly the expected disassembly
+     */
+    public static void checkMethod(String methodName, String expectedDisassembly) {
+        Method method = CompiledClassCache.instance().resolveMethod(methodName);
+        assertNotNull("method not found", method);
+        assertEquals("method name incorrect", methodName, method.getName());
+        expectedDisassembly = TestUtil.addLineNumbers(expectedDisassembly);
+        assertEquals("method opcodes incorrect", expectedDisassembly, TestUtil.disassemble(method.getOpcodes()));
     }
 }

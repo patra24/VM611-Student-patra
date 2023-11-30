@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents a while statement.
  */
@@ -19,6 +21,11 @@ public class WhileStatement extends Statement {
 
     public Statement getBody() {
         return body;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 
 }

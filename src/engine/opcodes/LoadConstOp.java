@@ -7,7 +7,7 @@ import engine.StackFrame;
 /**
  * Loads a constant onto the stack.
  */
-public class LoadConstOp implements Opcode {
+public class LoadConstOp extends Opcode {
     private int value;
 
     public LoadConstOp(int value) {
@@ -17,5 +17,10 @@ public class LoadConstOp implements Opcode {
     @Override
     public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
         opStack.push(value);
+    }
+
+    @Override
+    public String toString() {
+        return "load_const " + value;
     }
 }

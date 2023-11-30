@@ -1,5 +1,6 @@
 package ast.model;
 
+import ast.visitors.Visitor;
 import engine.opcodes.Operator;
 
 /**
@@ -27,5 +28,10 @@ public class BinaryExpression extends Expression {
 
     public Expression getRightChild() {
         return rightChild;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 }

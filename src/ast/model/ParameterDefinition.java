@@ -1,11 +1,13 @@
 package ast.model;
 
+import ast.visitors.Visitable;
+import ast.visitors.Visitor;
 import types.DataType;
 
 /**
  * Represents a parameter definition, e.g. "int x".
  */
-public class ParameterDefinition {
+public class ParameterDefinition implements Visitable {
     private String name;
     private DataType type;
 
@@ -21,4 +23,10 @@ public class ParameterDefinition {
     public DataType getType() {
         return type;
     }
+
+    @Override
+    public void accept(Visitor v) {
+
+    }
+
 }

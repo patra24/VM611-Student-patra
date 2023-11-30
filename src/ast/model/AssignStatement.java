@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents an assign statement.
  */
@@ -26,4 +28,8 @@ public class AssignStatement extends Statement {
         return value;
     }
 
+    @Override
+    public void accept(Visitor v) {
+
+    }
 }

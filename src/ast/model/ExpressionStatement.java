@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents a statement that is itself an expression, e.g. a method call.
  */
@@ -12,6 +14,11 @@ public class ExpressionStatement extends Statement {
 
     public Expression getExpression() {
         return expression;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 
 }

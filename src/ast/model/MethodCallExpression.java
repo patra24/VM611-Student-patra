@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents a function call.
  */
@@ -18,6 +20,11 @@ public class MethodCallExpression extends Expression {
 
     public ArgumentList getArguments() {
         return arguments;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 
 }

@@ -1,5 +1,7 @@
 package ast.model;
 
+import ast.visitors.Visitor;
+
 /**
  * Represents a return statement.
  */
@@ -12,6 +14,11 @@ public class ReturnStatement extends Statement {
 
     public Expression getReturnValue() {
         return returnValue;
+    }
+
+    @Override
+    public void accept(Visitor v) {
+
     }
 
 }

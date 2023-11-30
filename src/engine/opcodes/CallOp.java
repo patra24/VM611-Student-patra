@@ -13,7 +13,7 @@ import types.Method;
 /**
  * Calls a method.
  */
-public class CallOp implements Opcode {
+public class CallOp extends Opcode {
     private String methodName;
 
     public CallOp(String methodName) {
@@ -38,6 +38,11 @@ public class CallOp implements Opcode {
         // Create the new stack frame. pc will default to zero.
         StackFrame newFrame = new StackFrame(method.getOpcodes(), locals);
         callStack.push(newFrame);
+    }
+
+    @Override
+    public String toString() {
+        return "call " + methodName;
     }
 
 }
