@@ -20,7 +20,9 @@ import engine.opcodes.LoadLocalOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
 import engine.opcodes.ReturnOp;
+import engine.opcodes.SleepOp;
 import engine.opcodes.StoreLocalOp;
+import engine.opcodes.YieldOp;
 import types.Method;
 
 /**
@@ -97,6 +99,14 @@ public class TestUtil {
 
         if ("return".equals(opName)) {
             return new ReturnOp();
+        }
+
+        if ("yield".equals(opName)) {
+            return new YieldOp();
+        }
+
+        if ("sleep".equals(opName)) {
+            return new SleepOp(Integer.parseInt(tokens[1]));
         }
 
         throw new RuntimeException("Unrecognized opcode: " + opName);
@@ -182,5 +192,17 @@ public class TestUtil {
         assertEquals("method name incorrect", methodName, method.getName());
         expectedDisassembly = TestUtil.addLineNumbers(expectedDisassembly);
         assertEquals("method opcodes incorrect", expectedDisassembly, TestUtil.disassemble(method.getOpcodes()));
+    }
+
+    /**
+     * Compiles a method and saves it in the CompiledClassCache.
+     *
+     * @param methodName the method name
+     * @param code       the code
+     */
+    public static void compileMethod(String methodName, String code) {
+        List<Opcode> ops = TestUtil.parseOpcodes(code);
+        Method method = new Method(methodName, new ArrayList<>(), ops);
+        CompiledClassCache.instance().saveMethod(method);
     }
 }
