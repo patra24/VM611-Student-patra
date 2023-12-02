@@ -1,6 +1,7 @@
 package ast.visitors;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -24,7 +25,9 @@ import engine.opcodes.BranchOp;
 import engine.opcodes.BranchOp.Type;
 import engine.opcodes.CallOp;
 import engine.opcodes.LoadConstOp;
+import engine.opcodes.LoadFieldOp;
 import engine.opcodes.LoadLocalOp;
+import engine.opcodes.NewObjectOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
 import engine.opcodes.ReturnOp;
@@ -64,6 +67,7 @@ public class CompileVisitor extends AbstractVisitor {
 
     @Override
     public void visit(NullExpression expr) {
+        code.add(new LoadConstOp(0));
     }
 
     @Override
@@ -74,15 +78,23 @@ public class CompileVisitor extends AbstractVisitor {
 
     @Override
     public void postVisit(MethodCallExpression expr) {
+        // If we're not calling the method on a specific target, we're calling it on
+        // this object.
+        if (expr.getTarget() == null) {
+            code.add(new LoadLocalOp("this"));
+        }
         code.add(new CallOp(expr.getMethodName()));
     }
 
     @Override
     public void postTargetVisit(FieldAccessExpression expr) {
+        code.add(new LoadFieldOp(expr.getFieldName()));
     }
 
     @Override
     public void postVisit(NewObjectExpression expr) {
+        code.add(new NewObjectOp(expr.getClassName()));
+        code.add(new CallOp("init"));
     }
 
     @Override
@@ -157,6 +169,11 @@ public class CompileVisitor extends AbstractVisitor {
 
     @Override
     public void postVisit(MethodDefinition method) {
+        // If we're compiling a constructor, we need to return this on top of the stack.
+        if (method.getName().equals("init")) {
+            code.add(new LoadLocalOp("this"));
+        }
+
         // If the method didn't end with a return op, add one.
         if (code.isEmpty() || !(code.get(code.size() - 1) instanceof ReturnOp)) {
             code.add(new ReturnOp());
@@ -170,15 +187,28 @@ public class CompileVisitor extends AbstractVisitor {
 
     @Override
     public void visit(FieldDefinition field) {
+        // We don't generate code for fields, but we track them for type checking.
         currentClass.addField(new Field(field.getName(), field.getType()));
     }
 
     @Override
     public void preVisit(ClassDefinition clazz) {
+        currentClass = new Clazz(clazz.getName());
+        CompiledClassCache.instance().saveClass(currentClass);
     }
 
     @Override
     public void postVisit(ClassDefinition clazz) {
+        // Generate the default constructor if there wasn't one.
+        Method ctor = currentClass.getMethod("init");
+        if (ctor == null) {
+            currentClass.addMethod(new Method(
+                "init",
+                Collections.emptyList(),
+                List.of(
+                    new LoadLocalOp("this"),
+                    new ReturnOp())));
+        }
     }
 
     public List<Opcode> getOpcodes() {

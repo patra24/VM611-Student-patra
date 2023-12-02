@@ -21,7 +21,7 @@ public class Heap {
      * @return the entry
      */
     public HeapObject getEntry(int id) {
-        return null;
+        return entries.get(id);
     }
 
     /**
@@ -31,6 +31,9 @@ public class Heap {
      * @return the new object
      */
     public HeapObject createObject(Clazz clazz) {
-        return null;
+        HeapObject newObj = new HeapObject(nextId, clazz);
+        entries.put(nextId, newObj);
+        nextId++;
+        return newObj;
     }
 }

@@ -16,6 +16,8 @@ import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewObjectExpression;
+import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
 import ast.model.ParameterList;
 import ast.model.ReturnStatement;
@@ -91,7 +93,9 @@ public class Parser {
      */
     public FieldAccessExpression parseFieldAccessSelector(Expression target) {
         // field_access_selector ::= '.' identifier
-        return null;
+        tokens.consume(".");
+        String name = tokens.remove();
+        return new FieldAccessExpression(name, target);
     }
 
     /**
@@ -102,7 +106,9 @@ public class Parser {
      */
     public MethodCallExpression parseMethodCallSelector(Expression target) {
         // method_call_selector ::= '.' identifier arguments
-        return null;
+        tokens.consume(".");
+        String name = tokens.remove();
+        return new MethodCallExpression(name, target, parseArguments());
     }
 
     /**
@@ -112,7 +118,9 @@ public class Parser {
      */
     public Expression parseNewExpression() {
         // new_expression ::= 'new' data_type arguments
-        return null;
+        tokens.consume("new");
+        String typeName = tokens.remove();
+        return new NewObjectExpression(typeName, parseArguments());
     }
 
     /**
@@ -155,12 +163,21 @@ public class Parser {
             Expression right = parseExpression();
             tokens.consume(")");
             return new BinaryExpression(left, op, right);
+        } else if (tokens.lookahead("new")) {
+            return parseNewExpression();
+        } else if (tokens.lookahead("null")) {
+            tokens.consume("null");
+            return new NullExpression();
         } else if (Character.isAlphabetic(tokens.peek().charAt(0))) {
             if (tokens.lookahead("*", "(")) {
                 return parseMethodCallExpression(null);
-            } else {
-                return new VariableExpression(tokens.remove());
             }
+
+            Expression expr = new VariableExpression(tokens.remove());
+            while (tokens.lookahead(".") || tokens.lookahead("[")) {
+                expr = parseSelector(expr);
+            }
+            return expr;
         } else {
             return new ConstantExpression(Integer.parseInt(tokens.remove()));
         }
@@ -362,7 +379,11 @@ public class Parser {
      */
     public FieldDefinition parseField() {
         // field ::= 'field' data_type identifier ';'
-        return null;
+        tokens.consume("field");
+        DataType type = parseDataType();
+        String name = tokens.remove();
+        tokens.consume(";");
+        return new FieldDefinition(type, name);
     }
 
     /**
@@ -372,6 +393,22 @@ public class Parser {
      */
     public ClassDefinition parseClass() {
         // class ::= 'class' identifier '{' field* method* '}'
-        return null;
+        tokens.consume("class");
+        String name = tokens.remove();
+        tokens.consume("{");
+
+        List<FieldDefinition> fields = new ArrayList<>();
+        while (tokens.lookahead("field")) {
+            fields.add(parseField());
+        }
+
+        List<MethodDefinition> methods = new ArrayList<>();
+        while (!tokens.lookahead("}")) {
+            methods.add(parseMethod());
+        }
+
+        tokens.consume("}");
+
+        return new ClassDefinition(name, fields, methods);
     }
 }

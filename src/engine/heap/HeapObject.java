@@ -1,5 +1,6 @@
 package engine.heap;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import types.Clazz;
@@ -20,6 +21,9 @@ public class HeapObject {
      * @param clazz the clazz
      */
     public HeapObject(int id, Clazz clazz) {
+        this.id = id;
+        this.clazz = clazz;
+        this.fieldValues = new HashMap<>();
     }
 
     public int getId() {
@@ -35,10 +39,11 @@ public class HeapObject {
     }
 
     public int getFieldValue(String name) {
-        return 0;
+        return fieldValues.get(name);
     }
 
     public void setFieldValue(String name, int value) {
+        fieldValues.put(name, value);
     }
 
     @Override

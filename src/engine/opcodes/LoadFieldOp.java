@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import engine.StackFrame;
 import engine.heap.Heap;
+import engine.heap.HeapObject;
 
 /**
  * Loads an field onto the stack.
@@ -22,6 +23,9 @@ public class LoadFieldOp extends Opcode {
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+        int objId = opStack.pop();
+        HeapObject entry = heap.getEntry(objId);
+        opStack.push(entry.getFieldValue(fieldName));
     }
 
     @Override
