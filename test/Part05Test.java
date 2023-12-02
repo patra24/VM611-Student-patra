@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import engine.PriorityScheduler;
 import engine.VMThread;
+import engine.heap.Heap;
 
 public class Part05Test extends TestBase {
 
@@ -18,7 +19,7 @@ public class Part05Test extends TestBase {
     public void testSimpleExec() {
         /** #score(6) */
         hintContext = "(prio)";
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             load_const 3
@@ -26,7 +27,8 @@ public class Part05Test extends TestBase {
             add
             store_local y
             """);
-        VMThread t1 = new VMThread("t1");
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
@@ -62,21 +64,22 @@ public class Part05Test extends TestBase {
         /** #score(6) */
         hintContext = "(prio)";
 
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             load_const 7
             store_local y
             """);
-        VMThread t1 = new VMThread("t1");
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             store_local z
             """);
-        VMThread t2 = new VMThread("t2");
+        VMThread t2 = new VMThread("Main", "t2", heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
@@ -114,23 +117,24 @@ public class Part05Test extends TestBase {
         /** #score(6) */
         hintContext = "(prio)";
 
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             yield
             load_const 7
             store_local y
             """);
-        VMThread t1 = new VMThread("t1");
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             store_local z
             yield
             """);
-        VMThread t2 = new VMThread("t2");
+        VMThread t2 = new VMThread("Main", "t2", heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
@@ -174,22 +178,23 @@ public class Part05Test extends TestBase {
     public void testSleep() {
         /** #score(3) */
         hintContext = "(prio)";
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             sleep 1
             load_const 7
             store_local y
             """);
-        VMThread t1 = new VMThread("t1");
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             store_local z
             """);
-        VMThread t2 = new VMThread("t2");
+        VMThread t2 = new VMThread("Main", "t2", heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
@@ -224,22 +229,23 @@ public class Part05Test extends TestBase {
     public void testSleep2() {
         /** #score(3) */
         hintContext = "(prio)";
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             sleep 3
             load_const 7
             store_local y
             """);
-        VMThread t1 = new VMThread("t1");
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             store_local z
             """);
-        VMThread t2 = new VMThread("t2");
+        VMThread t2 = new VMThread("Main", "t2", heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
@@ -264,7 +270,7 @@ public class Part05Test extends TestBase {
         scheduler.run(2);
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 2, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 15, (int) t1Symbols.get("x"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
         assertEquals(hint("t1 symbol didn't have expected value"), 7, (int) t1Symbols.get("y"));
         assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
     }
@@ -274,21 +280,22 @@ public class Part05Test extends TestBase {
     public void testSleep3() {
         /** #score(3) */
         hintContext = "(prio)";
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             sleep 3
             store_local x
             """);
-        VMThread t1 = new VMThread("t1");
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             sleep 2
             store_local z
             """);
-        VMThread t2 = new VMThread("t2");
+        VMThread t2 = new VMThread("Main", "t2", heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
@@ -327,19 +334,20 @@ public class Part05Test extends TestBase {
     public void testPriorities() {
         /** #score(6) */
         hintContext = "(prio)";
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             """);
-        VMThread t1 = new VMThread("t1", 0);
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", 0, heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             store_local z
             """);
-        VMThread t2 = new VMThread("t2", 1);
+        VMThread t2 = new VMThread("Main", "t2", 1, heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
@@ -369,20 +377,21 @@ public class Part05Test extends TestBase {
         /** #score(6) */
         hintContext = "(prio)";
 
-        TestUtil.compileMethod("t1", """
+        TestUtil.compileMethod("Main", "t1", """
             load_const 5
             store_local x
             """);
-        VMThread t1 = new VMThread("t1", 0);
+        Heap heap = new Heap();
+        VMThread t1 = new VMThread("Main", "t1", 0, heap);
         Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
-        TestUtil.compileMethod("t2", """
+        TestUtil.compileMethod("Main", "t2", """
             load_const 6
             sleep 1
             store_local z
             """);
-        VMThread t2 = new VMThread("t2", 1);
+        VMThread t2 = new VMThread("Main", "t2", 1, heap);
         Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 

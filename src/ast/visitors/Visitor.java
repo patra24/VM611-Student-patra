@@ -3,12 +3,17 @@ package ast.visitors;
 import ast.model.ArgumentList;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
+import ast.model.ClassDefinition;
 import ast.model.CompoundStatement;
 import ast.model.ConstantExpression;
 import ast.model.ExpressionStatement;
+import ast.model.FieldAccessExpression;
+import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewObjectExpression;
+import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
 import ast.model.ParameterList;
 import ast.model.ReturnStatement;
@@ -23,6 +28,8 @@ public interface Visitor {
 
     void visit(VariableExpression expr);
 
+    void visit(NullExpression expr);
+
     void preVisit(BinaryExpression expr);
 
     void visit(BinaryExpression expr);
@@ -36,6 +43,8 @@ public interface Visitor {
     void postVisit(ArgumentList args);
 
     void preVisit(MethodCallExpression expr);
+
+    void preTargetVisit(MethodCallExpression expr);
 
     void postVisit(MethodCallExpression expr);
 
@@ -83,4 +92,15 @@ public interface Visitor {
 
     void postVisit(MethodDefinition method);
 
+    void visit(FieldDefinition field);
+
+    void postTargetVisit(FieldAccessExpression expr);
+
+    void preVisit(ClassDefinition clazz);
+
+    void postVisit(ClassDefinition clazz);
+
+    void preVisit(NewObjectExpression expr);
+
+    void postVisit(NewObjectExpression expr);
 }

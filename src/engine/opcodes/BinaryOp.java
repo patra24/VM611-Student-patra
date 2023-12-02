@@ -3,6 +3,7 @@ package engine.opcodes;
 import java.util.Stack;
 
 import engine.StackFrame;
+import engine.heap.Heap;
 
 /**
  * Performs an operation with the two values on the top of the stack.
@@ -21,7 +22,7 @@ public class BinaryOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
         int op2 = opStack.pop();
         int op1 = opStack.pop();
         int result = op.apply(op1, op2);

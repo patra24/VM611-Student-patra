@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import engine.StackFrame;
+import engine.heap.Heap;
 
 /**
  * Loads a local variable onto the stack.
@@ -16,7 +17,7 @@ public class LoadLocalOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
         Map<String, Integer> localVars = callStack.peek().getLocalVars();
         opStack.push(localVars.get(varName));
     }

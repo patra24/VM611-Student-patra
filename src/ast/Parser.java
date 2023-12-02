@@ -6,10 +6,13 @@ import java.util.List;
 import ast.model.ArgumentList;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
+import ast.model.ClassDefinition;
 import ast.model.CompoundStatement;
 import ast.model.ConstantExpression;
 import ast.model.Expression;
 import ast.model.ExpressionStatement;
+import ast.model.FieldAccessExpression;
+import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
@@ -74,10 +77,60 @@ public class Parser {
      *
      * @return the MethodCallExpression
      */
-    public MethodCallExpression parseMethodCallExpression() {
+    public MethodCallExpression parseMethodCallExpression(Expression targetExpression) {
         // method_call_expression ::= identifier arguments
         String name = tokens.remove();
-        return new MethodCallExpression(name, parseArguments());
+        return new MethodCallExpression(name, targetExpression, parseArguments());
+    }
+
+    /**
+     * Parses a field access selector, e.g. ".someField"
+     *
+     * @param target the target object expression
+     * @return the FieldAccessExpression
+     */
+    public FieldAccessExpression parseFieldAccessSelector(Expression target) {
+        // field_access_selector ::= '.' identifier
+        return null;
+    }
+
+    /**
+     * Parses a method call selector, e.g. ".someMethod(x, y)"
+     *
+     * @param target the target object expression
+     * @return the MethodCallExpression
+     */
+    public MethodCallExpression parseMethodCallSelector(Expression target) {
+        // method_call_selector ::= '.' identifier arguments
+        return null;
+    }
+
+    /**
+     * Parses a new expression, e.g. "new MyClass(3)".
+     *
+     * @return the Expression
+     */
+    public Expression parseNewExpression() {
+        // new_expression ::= 'new' data_type arguments
+        return null;
+    }
+
+    /**
+     * Parses a selector.
+     *
+     * @param target the target of the selector
+     * @return an Expression wrapping the target with the selector
+     */
+    public Expression parseSelector(Expression target) {
+        // @formatter:off
+        // selector ::=
+        //   field_access_selector |
+        //   method_call_selector
+        // @formatter:on
+        if (tokens.lookahead(".", "*", "(")) {
+            return parseMethodCallSelector(target);
+        }
+        return parseFieldAccessSelector(target);
     }
 
     /**
@@ -89,8 +142,10 @@ public class Parser {
         // @formatter:off
         // expression ::=
         //   '(' expression operator expression ')' |
+        //   new_expression |
         //   method_call_expression |
-        //   variable |
+        //   null_expression |
+        //   variable selector* |
         //   constant
         // @formatter:on
         if (tokens.lookahead("(")) {
@@ -102,7 +157,7 @@ public class Parser {
             return new BinaryExpression(left, op, right);
         } else if (Character.isAlphabetic(tokens.peek().charAt(0))) {
             if (tokens.lookahead("*", "(")) {
-                return parseMethodCallExpression();
+                return parseMethodCallExpression(null);
             } else {
                 return new VariableExpression(tokens.remove());
             }
@@ -230,9 +285,9 @@ public class Parser {
      * @return the DataType
      */
     public DataType parseDataType() {
-        // data_type ::= 'int'
-        tokens.consume("int");
-        return DataType.INT;
+        // data_type ::= base_type
+        String baseType = tokens.remove();
+        return new DataType(baseType);
     }
 
     /**
@@ -298,5 +353,25 @@ public class Parser {
         ParameterList params = parseParameters();
         CompoundStatement body = parseCompoundStatement();
         return new MethodDefinition(returnType, name, params, body);
+    }
+
+    /**
+     * Parses a field definition.
+     *
+     * @return the FieldDefinition
+     */
+    public FieldDefinition parseField() {
+        // field ::= 'field' data_type identifier ';'
+        return null;
+    }
+
+    /**
+     * Parses a class definition.
+     *
+     * @return the ClassDefinition
+     */
+    public ClassDefinition parseClass() {
+        // class ::= 'class' identifier '{' field* method* '}'
+        return null;
     }
 }

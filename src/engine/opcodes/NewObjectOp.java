@@ -6,22 +6,22 @@ import engine.StackFrame;
 import engine.heap.Heap;
 
 /**
- * Loads a constant onto the stack.
+ * Creates an object, and puts its id on the stack.
  */
-public class LoadConstOp extends Opcode {
-    private int value;
+public class NewObjectOp extends Opcode {
+    private String className;
 
-    public LoadConstOp(int value) {
-        this.value = value;
+    public NewObjectOp(String className) {
+        this.className = className;
     }
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
-        opStack.push(value);
     }
 
     @Override
     public String toString() {
-        return "load_const " + value;
+        return "new_object " + className;
     }
+
 }

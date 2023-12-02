@@ -6,21 +6,32 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import ast.Parser;
+import ast.model.ClassDefinition;
+import ast.model.Expression;
+import ast.model.FieldDefinition;
+import ast.model.MethodDefinition;
+import ast.model.Statement;
 import ast.visitors.CompileVisitor;
 import ast.visitors.PrintVisitor;
 import ast.visitors.Visitable;
 import engine.CompiledClassCache;
 import engine.VMThread;
+import engine.heap.Heap;
 import engine.opcodes.BinaryOp;
 import engine.opcodes.BranchOp;
 import engine.opcodes.CallOp;
 import engine.opcodes.LoadConstOp;
+import engine.opcodes.LoadFieldOp;
 import engine.opcodes.LoadLocalOp;
+import engine.opcodes.NewObjectOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
 import engine.opcodes.ReturnOp;
 import engine.opcodes.SleepOp;
+import engine.opcodes.StoreFieldOp;
 import engine.opcodes.StoreLocalOp;
 import engine.opcodes.YieldOp;
 import types.Method;
@@ -32,7 +43,7 @@ public class TestUtil {
     /**
      * Parses VM assembly into opcodes.
      *
-     * @param scanner
+     * @param code
      * @return
      */
     public static List<Opcode> parseOpcodes(String code) {
@@ -50,7 +61,7 @@ public class TestUtil {
                 tokens = Arrays.copyOfRange(tokens, 1, tokens.length);
             }
 
-            ops.add(TestUtil.createOpcode(tokens));
+            ops.add(createOpcode(tokens));
         }
         return ops;
     }
@@ -109,7 +120,78 @@ public class TestUtil {
             return new SleepOp(Integer.parseInt(tokens[1]));
         }
 
+        if ("new_object".equals(opName)) {
+            return new NewObjectOp(tokens[1]);
+        }
+
+        if ("load_field".equals(opName)) {
+            return new LoadFieldOp(tokens[1]);
+        }
+
+        if ("store_field".equals(opName)) {
+            return new StoreFieldOp(tokens[1]);
+        }
+
         throw new RuntimeException("Unrecognized opcode: " + opName);
+    }
+
+    /**
+     * Tests round-tripping the supplied code through the Parser and PrintVisitor.
+     *
+     * @param code        the code
+     * @param parseMethod the Parser method to use for parsing
+     */
+    private static <T extends Visitable> T testParse(String code, Function<Parser, T> parseMethod) {
+        T ast = parseMethod.apply(new Parser(code));
+        PrintVisitor v = new PrintVisitor();
+        ast.accept(v);
+        assertEquals("code incorrect", code, v.getResult());
+        return ast;
+    }
+
+    /**
+     * Tests parsing an expression and converting it back to code.
+     *
+     * @param code the code
+     */
+    public static Expression testParseExpression(String code) {
+        return TestUtil.testParse(code, Parser::parseExpression);
+    }
+
+    /**
+     * Tests parsing a field definition and converting it back to code.
+     *
+     * @param code the code
+     */
+    public static FieldDefinition testParseField(String code) {
+        return TestUtil.testParse(code, Parser::parseField);
+    }
+
+    /**
+     * Tests parsing a statement and converting it back to code.
+     *
+     * @param code the code
+     */
+    public static Statement testParseStatement(String code) {
+        return testParse(code, Parser::parseSimpleStatement);
+    }
+
+    /**
+     * Tests parsing a method and converting it back to code.
+     *
+     * @param code the code
+     */
+    public static MethodDefinition testParseMethod(String code) {
+        return testParse(code, Parser::parseMethod);
+    }
+
+    /**
+     * Tests parsing a class and converting it back to code.
+     *
+     * @param code the code
+     */
+    public static ClassDefinition testParseClass(String code) {
+        return testParse(code, Parser::parseClass);
     }
 
     /**
@@ -121,8 +203,8 @@ public class TestUtil {
     public static Map<String, Integer> testCode(String code) {
         List<Opcode> ops = parseOpcodes(code);
         Method method = new Method("main", Collections.emptyList(), ops);
-        CompiledClassCache.instance().saveMethod(method);
-        VMThread e = new VMThread("main");
+        CompiledClassCache.instance().saveMethod("Main", method);
+        VMThread e = new VMThread("Main", "main", new Heap());
         return e.run();
     }
 
@@ -175,19 +257,32 @@ public class TestUtil {
     public static void testCompileAST(Visitable root, String expectedDisassembly) {
         CompileVisitor v = new CompileVisitor();
         root.accept(v);
-        String actualDisassembly = TestUtil.disassemble(v.getOpcodes());
-        expectedDisassembly = TestUtil.addLineNumbers(expectedDisassembly);
+        String actualDisassembly = disassemble(v.getOpcodes());
+        expectedDisassembly = addLineNumbers(expectedDisassembly);
+        assertEquals("generated code incorrect", expectedDisassembly, actualDisassembly);
+    }
+
+    public static void testCompileMethod(MethodDefinition method, String expectedDisassembly) {
+        CompileVisitor v = new CompileVisitor();
+        method.accept(v);
+
+        Method m = CompiledClassCache.instance().resolveMethod("Main", method.getName());
+        assertNotNull("Method missing from CompiledClassCache", m);
+
+        String actualDisassembly = disassemble(m.getOpcodes());
+        expectedDisassembly = addLineNumbers(expectedDisassembly);
         assertEquals("generated code incorrect", expectedDisassembly, actualDisassembly);
     }
 
     /**
      * Gets a method from the CompiledClassCache, and checks its disassembly.
      *
+     * @param className           the class name
      * @param methodName          the method name
      * @param expectedDisassembly the expected disassembly
      */
-    public static void checkMethod(String methodName, String expectedDisassembly) {
-        Method method = CompiledClassCache.instance().resolveMethod(methodName);
+    public static void checkMethod(String className, String methodName, String expectedDisassembly) {
+        Method method = CompiledClassCache.instance().resolveMethod(className, methodName);
         assertNotNull("method not found", method);
         assertEquals("method name incorrect", methodName, method.getName());
         expectedDisassembly = TestUtil.addLineNumbers(expectedDisassembly);
@@ -200,9 +295,21 @@ public class TestUtil {
      * @param methodName the method name
      * @param code       the code
      */
-    public static void compileMethod(String methodName, String code) {
-        List<Opcode> ops = TestUtil.parseOpcodes(code);
+    public static void compileMethod(String className, String methodName, String code) {
+        List<Opcode> ops = parseOpcodes(code);
         Method method = new Method(methodName, new ArrayList<>(), ops);
-        CompiledClassCache.instance().saveMethod(method);
+        CompiledClassCache.instance().saveMethod(className, method);
+    }
+
+    /**
+     * Compiles a class.
+     *
+     * @param code the code
+     */
+    public static void compileClass(String code) {
+        Parser parser = new Parser(code);
+        Visitable ast = parser.parseClass();
+        CompileVisitor v = new CompileVisitor();
+        ast.accept(v);
     }
 }

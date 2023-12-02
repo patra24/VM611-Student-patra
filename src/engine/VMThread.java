@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import engine.VMThreadState.State;
+import engine.heap.Heap;
 import engine.opcodes.Opcode;
 import types.Method;
 
@@ -20,17 +21,19 @@ public class VMThread {
     private int priority;
     private Stack<StackFrame> callStack;
     private Stack<Integer> opStack;
+    private Heap heap;
 
-    public VMThread(String entryPointName) {
-        entryPoint = CompiledClassCache.instance().resolveMethod(entryPointName);
+    public VMThread(String className, String entryPointName, Heap heap) {
+        this.heap = heap;
+        entryPoint = CompiledClassCache.instance().resolveMethod(className, entryPointName);
         entryPointLocals = new HashMap<>();
         callStack = new Stack<>();
         callStack.push(new StackFrame(entryPoint.getOpcodes(), entryPointLocals));
         opStack = new Stack<>();
     }
 
-    public VMThread(String entryPointName, int priority) {
-        this(entryPointName);
+    public VMThread(String className, String entryPointName, int priority, Heap heap) {
+        this(className, entryPointName, heap);
         this.priority = priority;
     }
 
@@ -48,7 +51,7 @@ public class VMThread {
         }
 
         int pc = frame.getProgramCounter();
-        VMThreadState state = op.executeWithState(callStack, opStack);
+        VMThreadState state = op.executeWithState(callStack, heap, opStack);
         // If the op wasn't a branch that updated pc, go to the next instruction.
         if (frame.getProgramCounter() == pc) {
             frame.advanceProgramCounter();

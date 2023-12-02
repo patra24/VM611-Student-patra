@@ -7,10 +7,12 @@ import ast.visitors.Visitor;
  */
 public class MethodCallExpression extends Expression {
     private String methodName;
+    private Expression target;
     private ArgumentList arguments;
 
-    public MethodCallExpression(String methodName, ArgumentList arguments) {
+    public MethodCallExpression(String methodName, Expression target, ArgumentList arguments) {
         this.methodName = methodName;
+        this.target = target;
         this.arguments = arguments;
     }
 
@@ -22,10 +24,18 @@ public class MethodCallExpression extends Expression {
         return arguments;
     }
 
+    public Expression getTarget() {
+        return target;
+    }
+
     @Override
     public void accept(Visitor v) {
         v.preVisit(this);
         arguments.accept(v);
+        v.preTargetVisit(this);
+        if (target != null) {
+            target.accept(v);
+        }
         v.postVisit(this);
     }
 

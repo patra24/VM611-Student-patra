@@ -3,12 +3,17 @@ package ast.visitors;
 import ast.model.ArgumentList;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
+import ast.model.ClassDefinition;
 import ast.model.CompoundStatement;
 import ast.model.ConstantExpression;
 import ast.model.ExpressionStatement;
+import ast.model.FieldAccessExpression;
+import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewObjectExpression;
+import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
 import ast.model.ParameterList;
 import ast.model.ReturnStatement;
@@ -26,6 +31,10 @@ public abstract class AbstractVisitor implements Visitor {
 
     @Override
     public void visit(VariableExpression expr) {
+    }
+
+    @Override
+    public void visit(NullExpression expr) {
     }
 
     @Override
@@ -54,6 +63,10 @@ public abstract class AbstractVisitor implements Visitor {
 
     @Override
     public void preVisit(MethodCallExpression expr) {
+    }
+
+    @Override
+    public void preTargetVisit(MethodCallExpression expr) {
     }
 
     @Override
@@ -146,6 +159,30 @@ public abstract class AbstractVisitor implements Visitor {
 
     @Override
     public void postVisit(MethodDefinition method) {
+    }
+
+    @Override
+    public void postTargetVisit(FieldAccessExpression expr) {
+    }
+
+    @Override
+    public void postVisit(ClassDefinition clazz) {
+    }
+
+    @Override
+    public void postVisit(NewObjectExpression expr) {
+    }
+
+    @Override
+    public void preVisit(ClassDefinition clazz) {
+    }
+
+    @Override
+    public void preVisit(NewObjectExpression expr) {
+    }
+
+    @Override
+    public void visit(FieldDefinition field) {
     }
 
 }

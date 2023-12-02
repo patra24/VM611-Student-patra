@@ -5,12 +5,17 @@ import java.util.Stack;
 import ast.model.ArgumentList;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
+import ast.model.ClassDefinition;
 import ast.model.CompoundStatement;
 import ast.model.ConstantExpression;
 import ast.model.ExpressionStatement;
+import ast.model.FieldAccessExpression;
+import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewObjectExpression;
+import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
 import ast.model.ParameterList;
 import ast.model.ReturnStatement;
@@ -41,6 +46,11 @@ public class PrintVisitor extends AbstractVisitor {
     @Override
     public void visit(VariableExpression expr) {
         sb.append(expr.getName());
+    }
+
+    @Override
+    public void visit(NullExpression expr) {
+        sb.append("null");
     }
 
     @Override
@@ -116,11 +126,28 @@ public class PrintVisitor extends AbstractVisitor {
     }
 
     @Override
-    public void postVisit(MethodCallExpression expr) {
+    public void preTargetVisit(MethodCallExpression expr) {
         // Capture the arguments.
         methodArgumentSnips.push(endSnippet());
+    }
+
+    @Override
+    public void postVisit(MethodCallExpression expr) {
+        if (expr.getTarget() != null) {
+            sb.append('.');
+        }
         // Use the captured arguments.
         sb.append(expr.getMethodName()).append(methodArgumentSnips.pop());
+    }
+
+    @Override
+    public void postTargetVisit(FieldAccessExpression expr) {
+        sb.append('.').append(expr.getFieldName());
+    }
+
+    @Override
+    public void preVisit(NewObjectExpression expr) {
+        sb.append("new ").append(expr.getClassName());
     }
 
     @Override
@@ -194,6 +221,11 @@ public class PrintVisitor extends AbstractVisitor {
     }
 
     @Override
+    public void visit(FieldDefinition field) {
+        sb.append(indent).append("field ").append(field.getType()).append(' ').append(field.getName()).append(";\n");
+    }
+
+    @Override
     public void preVisit(MethodDefinition method) {
         sb.append(indent).append(method.getReturnType()).append(' ').append(method.getName());
     }
@@ -201,6 +233,18 @@ public class PrintVisitor extends AbstractVisitor {
     @Override
     public void postVisit(MethodDefinition method) {
         sb.append("\n");
+    }
+
+    @Override
+    public void preVisit(ClassDefinition clazz) {
+        sb.append("class ").append(clazz.getName()).append(" {\n");
+        indent.append("  ");
+    }
+
+    @Override
+    public void postVisit(ClassDefinition clazz) {
+        indent.delete(indent.length() - 2, indent.length());
+        sb.append("}\n");
     }
 
     /**

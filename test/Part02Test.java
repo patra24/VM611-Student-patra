@@ -76,6 +76,11 @@ public class Part02Test extends TestBase {
     public void testCallAndReturn() {
         /** #score(5) */
         hintContext = "call a function and return";
+        Method ctor = new Method(
+            "init",
+            List.of(), TestUtil.parseOpcodes(
+                "return\n"));
+        CompiledClassCache.instance().saveMethod("Main", ctor);
 
         Method foo = new Method(
             "foo",
@@ -84,14 +89,19 @@ public class Part02Test extends TestBase {
                 load_const 5
                 return
                 """));
-        CompiledClassCache.instance().saveMethod(foo);
+        CompiledClassCache.instance().saveMethod("Main", foo);
 
         Map<String, Integer> vars = TestUtil.testCode("""
+            new_object Main
+            store_local o
+            load_local o
             call foo
             store_local a
             load_const 123
+            load_local o
             call foo
             load_const 234
+            load_local o
             call foo
             store_local b
             store_local c
@@ -122,7 +132,7 @@ public class Part02Test extends TestBase {
                 sub
                 return
                 """));
-        CompiledClassCache.instance().saveMethod(addMethod);
+        CompiledClassCache.instance().saveMethod("Main", addMethod);
 
         Method maxMethod = new Method(
             "max",
@@ -140,19 +150,24 @@ public class Part02Test extends TestBase {
                 7: load_local y
                 8: return
                 """));
-        CompiledClassCache.instance().saveMethod(maxMethod);
+        CompiledClassCache.instance().saveMethod("Main", maxMethod);
 
         Map<String, Integer> vars = TestUtil.testCode("""
+            new_object Main
+            store_local o
             load_const 33
             load_const 12
+            load_local o
             call sub
             store_local x
             load_const 12
             load_const 33
+            load_local o
             call max
             store_local y
             load_const 33
             load_const 12
+            load_local o
             call max
             store_local z
             """);
@@ -178,7 +193,7 @@ public class Part02Test extends TestBase {
                 add
                 return
                 """));
-        CompiledClassCache.instance().saveMethod(addMethod);
+        CompiledClassCache.instance().saveMethod("Main", addMethod);
 
         Method fooMethod = new Method(
             "foo",
@@ -188,16 +203,21 @@ public class Part02Test extends TestBase {
             TestUtil.parseOpcodes("""
                 load_local x
                 load_local y
+                load_local this
                 call add
                 load_local y
+                load_local this
                 call add
                 return
                 """));
-        CompiledClassCache.instance().saveMethod(fooMethod);
+        CompiledClassCache.instance().saveMethod("Main", fooMethod);
 
         Map<String, Integer> vars = TestUtil.testCode("""
+            new_object Main
+            store_local o
             load_const 12
             load_const 33
+            load_local o
             call foo
             store_local x
             """);
@@ -224,16 +244,21 @@ public class Part02Test extends TestBase {
                 7: load_local x
                 8: load_const 1
                 9: sub
-                10: call factorial
-                11: mul
-                12: return
+                10: load_local this
+                11: call factorial
+                12: mul
+                13: return
                 """));
-        CompiledClassCache.instance().saveMethod(factorialMethod);
+        CompiledClassCache.instance().saveMethod("Main", factorialMethod);
 
         Map<String, Integer> vars = TestUtil.testCode("""
+            new_object Main
+            store_local o
             load_const 3
+            load_local o
             call factorial
             load_const 4
+            load_local o
             call factorial
             store_local y
             store_local x
@@ -261,20 +286,26 @@ public class Part02Test extends TestBase {
                 6: load_local x
                 7: load_const 2
                 8: sub
-                9: call fib
-                10: load_local x
-                11: load_const 1
-                12: sub
-                13: call fib
-                14: add
-                15: return
+                9: load_local this
+                10: call fib
+                11: load_local x
+                12: load_const 1
+                13: sub
+                14: load_local this
+                15: call fib
+                16: add
+                17: return
                 """));
-        CompiledClassCache.instance().saveMethod(factorialMethod);
+        CompiledClassCache.instance().saveMethod("Main", factorialMethod);
 
         Map<String, Integer> vars = TestUtil.testCode("""
+            new_object Main
+            store_local o
             load_const 5
+            load_local o
             call fib
             load_const 7
+            load_local o
             call fib
             store_local y
             store_local x

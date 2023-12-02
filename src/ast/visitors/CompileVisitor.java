@@ -6,10 +6,15 @@ import java.util.Stack;
 
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
+import ast.model.ClassDefinition;
 import ast.model.ConstantExpression;
+import ast.model.FieldAccessExpression;
+import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewObjectExpression;
+import ast.model.NullExpression;
 import ast.model.ReturnStatement;
 import ast.model.VariableExpression;
 import ast.model.WhileStatement;
@@ -23,6 +28,8 @@ import engine.opcodes.LoadLocalOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
 import engine.opcodes.ReturnOp;
+import types.Clazz;
+import types.Field;
 import types.Method;
 
 /**
@@ -35,8 +42,14 @@ public class CompileVisitor extends AbstractVisitor {
     private Stack<WhileLabelInfo> whileStack = new Stack<>();
     /** Tracks info on ifs we're currently inside of */
     private Stack<IfLabelInfo> ifStack = new Stack<>();
+    /** The class we're currently compiling */
+    private Clazz currentClass;
 
     public CompileVisitor() {
+        // If we don't see the beginning of a class definition, we'll put methods in the
+        // class Main.
+        currentClass = new Clazz("Main");
+        CompiledClassCache.instance().saveClass(currentClass);
     }
 
     @Override
@@ -50,6 +63,10 @@ public class CompileVisitor extends AbstractVisitor {
     }
 
     @Override
+    public void visit(NullExpression expr) {
+    }
+
+    @Override
     public void postVisit(BinaryExpression expr) {
         Operator oper = expr.getOperator();
         code.add(new BinaryOp(oper));
@@ -58,6 +75,14 @@ public class CompileVisitor extends AbstractVisitor {
     @Override
     public void postVisit(MethodCallExpression expr) {
         code.add(new CallOp(expr.getMethodName()));
+    }
+
+    @Override
+    public void postTargetVisit(FieldAccessExpression expr) {
+    }
+
+    @Override
+    public void postVisit(NewObjectExpression expr) {
     }
 
     @Override
@@ -139,7 +164,21 @@ public class CompileVisitor extends AbstractVisitor {
 
         // Save the compiled method.
         Method compiledMethod = new Method(method.getName(), method.getParameters(), code);
-        CompiledClassCache.instance().saveMethod(compiledMethod);
+        currentClass.addMethod(compiledMethod);
+        code = new ArrayList<>();
+    }
+
+    @Override
+    public void visit(FieldDefinition field) {
+        currentClass.addField(new Field(field.getName(), field.getType()));
+    }
+
+    @Override
+    public void preVisit(ClassDefinition clazz) {
+    }
+
+    @Override
+    public void postVisit(ClassDefinition clazz) {
     }
 
     public List<Opcode> getOpcodes() {

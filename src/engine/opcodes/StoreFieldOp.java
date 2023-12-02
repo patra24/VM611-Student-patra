@@ -6,22 +6,22 @@ import engine.StackFrame;
 import engine.heap.Heap;
 
 /**
- * Loads a constant onto the stack.
+ * Store a value from the stack into a field.
  */
-public class LoadConstOp extends Opcode {
-    private int value;
+public class StoreFieldOp extends Opcode {
+    private String fieldName;
 
-    public LoadConstOp(int value) {
-        this.value = value;
+    public StoreFieldOp(String fieldName) {
+        this.fieldName = fieldName;
     }
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
-        opStack.push(value);
     }
 
     @Override
     public String toString() {
-        return "load_const " + value;
+        return "store_field " + fieldName;
     }
+
 }

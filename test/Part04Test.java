@@ -377,12 +377,14 @@ public class Part04Test {
     Statement s = new Parser(
       "foo();\n").parseSimpleStatement();
     TestUtil.testCompileAST(s, """
+      load_local this
       call foo
       """);
 
     s = new Parser("foo(3);\n").parseSimpleStatement();
     TestUtil.testCompileAST(s, """
       load_const 3
+      load_local this
       call foo
       """);
 
@@ -390,6 +392,7 @@ public class Part04Test {
     TestUtil.testCompileAST(s, """
       load_local x
       load_local y
+      load_local this
       call foo
       store_local z
       """);
@@ -401,7 +404,9 @@ public class Part04Test {
       add
       load_local y
       load_local z
+      load_local this
       call bar
+      load_local this
       call foo
       store_local res
       """);
@@ -632,7 +637,7 @@ public class Part04Test {
       """).parseMethod();
     CompileVisitor v = new CompileVisitor();
     m.accept(v);
-    TestUtil.checkMethod("foo",
+    TestUtil.checkMethod("Main", "foo",
       "return\n");
 
     m = new Parser("""
@@ -642,7 +647,7 @@ public class Part04Test {
       """).parseMethod();
     v = new CompileVisitor();
     m.accept(v);
-    TestUtil.checkMethod("add", """
+    TestUtil.checkMethod("Main", "add", """
       load_local x
       load_local y
       add
@@ -660,7 +665,7 @@ public class Part04Test {
       """).parseMethod();
     v = new CompileVisitor();
     m.accept(v);
-    TestUtil.checkMethod("max", """
+    TestUtil.checkMethod("Main", "max", """
       0: load_local x
       1: load_local y
       2: cmpGT
@@ -683,7 +688,7 @@ public class Part04Test {
       """).parseMethod();
     v = new CompileVisitor();
     m.accept(v);
-    TestUtil.checkMethod("foo", """
+    TestUtil.checkMethod("Main", "foo", """
       0: load_local x
       1: load_const 3
       2: cmpLT

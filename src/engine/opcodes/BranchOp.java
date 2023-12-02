@@ -3,6 +3,7 @@ package engine.opcodes;
 import java.util.Stack;
 
 import engine.StackFrame;
+import engine.heap.Heap;
 
 /**
  * Possibly branches to another location in the code.
@@ -23,7 +24,7 @@ public class BranchOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
         if (type == Type.UNCONDITIONAL ||
         // Only one of these pops will happen, because of short-circuiting.
             (type == Type.TRUE && opStack.pop() == 1) ||

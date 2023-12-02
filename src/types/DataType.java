@@ -6,12 +6,22 @@ package types;
 public class DataType {
     /** The scalar type - void, int, object */
     private BaseType baseType;
+    /** The class name if this is an object */
+    private String className;
 
     public DataType(String typeName) {
         switch (typeName) {
         case "int" -> this.baseType = BaseType.INT;
         case "void" -> this.baseType = BaseType.VOID;
+        default -> {
+            this.baseType = BaseType.OBJECT;
+            this.className = typeName;
         }
+        }
+    }
+
+    public String getClassName() {
+        return className;
     }
 
     @Override
@@ -21,7 +31,7 @@ public class DataType {
 
     @Override
     public String toString() {
-        return baseType.toString();
+        return baseType == BaseType.OBJECT ? className : baseType.toString();
     }
 
     public static DataType INT = new DataType("int");
@@ -29,7 +39,8 @@ public class DataType {
 
     public enum BaseType {
         VOID,
-        INT;
+        INT,
+        OBJECT;
 
         @Override
         public String toString() {

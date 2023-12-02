@@ -5,6 +5,7 @@ import java.util.Stack;
 import engine.StackFrame;
 import engine.VMThreadState;
 import engine.VMThreadState.State;
+import engine.heap.Heap;
 
 public abstract class Opcode {
     /**
@@ -13,7 +14,7 @@ public abstract class Opcode {
      * @param callStack the call stack
      * @param opStack   the op stack
      */
-    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
         throw new RuntimeException("Either override this or override executeWithState");
     }
 
@@ -25,8 +26,8 @@ public abstract class Opcode {
      * @param opStack   the op stack
      * @return the state of the thread
      */
-    public VMThreadState executeWithState(Stack<StackFrame> callStack, Stack<Integer> opStack) {
-        execute(callStack, opStack);
+    public VMThreadState executeWithState(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+        execute(callStack, heap, opStack);
         return new VMThreadState(State.Running, 0);
     }
 

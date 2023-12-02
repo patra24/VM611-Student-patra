@@ -8,6 +8,8 @@ import java.util.Stack;
 import ast.model.ParameterDefinition;
 import engine.CompiledClassCache;
 import engine.StackFrame;
+import engine.heap.Heap;
+import engine.heap.HeapObject;
 import types.Method;
 
 /**
@@ -21,12 +23,14 @@ public class CallOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Stack<Integer> opStack) {
-
-        Method method = CompiledClassCache.instance().resolveMethod(methodName);
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+        int objId = opStack.pop();
+        HeapObject obj = heap.getEntry(objId);
+        Method method = CompiledClassCache.instance().resolveMethod(obj.getClazz().getName(), methodName);
 
         // Create a new locals map, and populate it with the method arguments.
         Map<String, Integer> locals = new HashMap<>();
+        locals.put("this", objId);
         List<ParameterDefinition> params = method.getParameters();
         // Parameters are on the stack in reverse order.
         for (int i = params.size() - 1; i >= 0; i--) {
