@@ -46,6 +46,30 @@ public class Heap {
      * @return the new array
      */
     public HeapArray createArray(DataType arrType, int[] dims) {
-        return null;
+        return createArray(arrType, dims, 0);
+    }
+
+    private HeapArray createArray(DataType arrType, int[] dims, int index) {
+        HeapArray arr = createHeapArray(arrType, dims[index]);
+
+        if (index == dims.length - 1) {
+            return arr;
+        }
+
+        // Recursively create the subarrays.
+        DataType subArrType = arrType.getElementType();
+        for (int i = 0; i < dims[index]; i++) {
+            HeapArray subArr = createArray(subArrType, dims, index + 1);
+            arr.setAt(i, subArr.getId());
+        }
+
+        return arr;
+    }
+
+    private HeapArray createHeapArray(DataType type, int length) {
+        HeapArray arr = new HeapArray(nextId, type, length);
+        entries.put(nextId, arr);
+        nextId++;
+        return arr;
     }
 }

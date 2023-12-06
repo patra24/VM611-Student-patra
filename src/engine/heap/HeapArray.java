@@ -59,6 +59,9 @@ public class HeapArray extends HeapEntry {
 
     @Override
     public int getFieldValue(String name) {
-        return 0;
+        if ("length".equals(name)) {
+            return data.length;
+        }
+        throw new RuntimeException("Arrays do not have field: " + name);
     }
 }

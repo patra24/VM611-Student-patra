@@ -17,6 +17,7 @@ import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewArrayExpression;
 import ast.model.NewObjectExpression;
 import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
@@ -120,12 +121,10 @@ public class Parser {
      */
     public ArraySelectorExpression parseArraySelector(Expression target) {
         // array_selector ::= '[' expression ']'
-
-        // This prevents the tests from timing out - remove it when you're
-        // ready to write this method.
-        tokens.consume("nothing");
-
-        return null;
+        tokens.consume("[");
+        Expression expr = parseExpression();
+        tokens.consume("]");
+        return new ArraySelectorExpression(target, expr);
     }
 
     /**
@@ -137,7 +136,17 @@ public class Parser {
         // new_expression ::= 'new' data_type (arguments | ('[' expression ']')+)
         tokens.consume("new");
         String typeName = tokens.remove();
-        return new NewObjectExpression(typeName, parseArguments());
+        if (tokens.lookahead("(")) {
+            return new NewObjectExpression(typeName, parseArguments());
+        }
+
+        List<Expression> arrayDims = new ArrayList<>();
+        while (tokens.lookahead("[")) {
+            tokens.consume("[");
+            arrayDims.add(parseExpression());
+            tokens.consume("]");
+        }
+        return new NewArrayExpression(typeName, arrayDims);
     }
 
     /**
@@ -325,7 +334,13 @@ public class Parser {
     public DataType parseDataType() {
         // data_type ::= base_type empty_brackets*
         String baseType = tokens.remove();
-        return new DataType(baseType);
+        int numDims = 0;
+        while (tokens.lookahead("[")) {
+            tokens.consume("[");
+            tokens.consume("]");
+            numDims++;
+        }
+        return new DataType(baseType, numDims);
     }
 
     /**

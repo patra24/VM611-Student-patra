@@ -26,9 +26,11 @@ import engine.opcodes.BinaryOp;
 import engine.opcodes.BranchOp;
 import engine.opcodes.BranchOp.Type;
 import engine.opcodes.CallOp;
+import engine.opcodes.LoadArrayElementOp;
 import engine.opcodes.LoadConstOp;
 import engine.opcodes.LoadFieldOp;
 import engine.opcodes.LoadLocalOp;
+import engine.opcodes.NewArrayOp;
 import engine.opcodes.NewObjectOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
@@ -95,6 +97,7 @@ public class CompileVisitor extends AbstractVisitor {
 
     @Override
     public void postVisit(ArraySelectorExpression expr) {
+        code.add(new LoadArrayElementOp());
     }
 
     @Override
@@ -105,6 +108,7 @@ public class CompileVisitor extends AbstractVisitor {
 
     @Override
     public void postVisit(NewArrayExpression expr) {
+        code.add(new NewArrayOp(expr.getType(), expr.getNumDimensions()));
     }
 
     @Override

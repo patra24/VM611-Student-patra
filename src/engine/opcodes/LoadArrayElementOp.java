@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import engine.StackFrame;
 import engine.heap.Heap;
+import engine.heap.HeapArray;
 
 /**
  * Loads an array element onto the stack.
@@ -12,6 +13,10 @@ public class LoadArrayElementOp extends Opcode {
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+        int val = opStack.pop();
+        HeapArray arr = (HeapArray) heap.getEntry(val);
+        int index = opStack.pop();
+        opStack.push(arr.getAt(index));
     }
 
     @Override
