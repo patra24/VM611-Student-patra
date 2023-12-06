@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import types.Clazz;
+import types.DataType;
 
 /**
  * Heap stores objects and arrays.
@@ -12,7 +13,7 @@ public class Heap {
     /** The next id to be assigned. */
     private int nextId = 1;
     /** The heap entries, by id. */
-    private Map<Integer, HeapObject> entries = new HashMap<>();
+    private Map<Integer, HeapEntry> entries = new HashMap<>();
 
     /**
      * Gets an entry by id.
@@ -20,7 +21,7 @@ public class Heap {
      * @param id the id
      * @return the entry
      */
-    public HeapObject getEntry(int id) {
+    public HeapEntry getEntry(int id) {
         return entries.get(id);
     }
 
@@ -35,5 +36,16 @@ public class Heap {
         entries.put(nextId, newObj);
         nextId++;
         return newObj;
+    }
+
+    /**
+     * Creates a new array.
+     *
+     * @param arrType the type of the array
+     * @param dims    the array dimensions
+     * @return the new array
+     */
+    public HeapArray createArray(DataType arrType, int[] dims) {
+        return null;
     }
 }

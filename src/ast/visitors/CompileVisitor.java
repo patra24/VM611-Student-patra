@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
+import ast.model.ArraySelectorExpression;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
 import ast.model.ClassDefinition;
@@ -14,6 +15,7 @@ import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewArrayExpression;
 import ast.model.NewObjectExpression;
 import ast.model.NullExpression;
 import ast.model.ReturnStatement;
@@ -92,9 +94,17 @@ public class CompileVisitor extends AbstractVisitor {
     }
 
     @Override
+    public void postVisit(ArraySelectorExpression expr) {
+    }
+
+    @Override
     public void postVisit(NewObjectExpression expr) {
         code.add(new NewObjectOp(expr.getClassName()));
         code.add(new CallOp("init"));
+    }
+
+    @Override
+    public void postVisit(NewArrayExpression expr) {
     }
 
     @Override

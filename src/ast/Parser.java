@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.model.ArgumentList;
+import ast.model.ArraySelectorExpression;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
 import ast.model.ClassDefinition;
@@ -112,12 +113,28 @@ public class Parser {
     }
 
     /**
-     * Parses a new expression, e.g. "new MyClass(3)".
+     * Parses an array selector, e.g. "[x][2 + y]".
+     *
+     * @param target the target array expression
+     * @return
+     */
+    public ArraySelectorExpression parseArraySelector(Expression target) {
+        // array_selector ::= '[' expression ']'
+
+        // This prevents the tests from timing out - remove it when you're
+        // ready to write this method.
+        tokens.consume("nothing");
+
+        return null;
+    }
+
+    /**
+     * Parses a new expression, e.g. "new MyClass(3)" or "new int[3]".
      *
      * @return the Expression
      */
     public Expression parseNewExpression() {
-        // new_expression ::= 'new' data_type arguments
+        // new_expression ::= 'new' data_type (arguments | ('[' expression ']')+)
         tokens.consume("new");
         String typeName = tokens.remove();
         return new NewObjectExpression(typeName, parseArguments());
@@ -133,12 +150,16 @@ public class Parser {
         // @formatter:off
         // selector ::=
         //   field_access_selector |
-        //   method_call_selector
+        //   method_call_selector |
+        //   array_selector
         // @formatter:on
         if (tokens.lookahead(".", "*", "(")) {
             return parseMethodCallSelector(target);
         }
-        return parseFieldAccessSelector(target);
+        if (tokens.lookahead(".")) {
+            return parseFieldAccessSelector(target);
+        }
+        return parseArraySelector(target);
     }
 
     /**
@@ -297,12 +318,12 @@ public class Parser {
     }
 
     /**
-     * Parses a data type.
+     * Parses a data type, e.g. int or MyClass or int[][].
      *
      * @return the DataType
      */
     public DataType parseDataType() {
-        // data_type ::= base_type
+        // data_type ::= base_type empty_brackets*
         String baseType = tokens.remove();
         return new DataType(baseType);
     }

@@ -23,14 +23,17 @@ import engine.heap.Heap;
 import engine.opcodes.BinaryOp;
 import engine.opcodes.BranchOp;
 import engine.opcodes.CallOp;
+import engine.opcodes.LoadArrayElementOp;
 import engine.opcodes.LoadConstOp;
 import engine.opcodes.LoadFieldOp;
 import engine.opcodes.LoadLocalOp;
+import engine.opcodes.NewArrayOp;
 import engine.opcodes.NewObjectOp;
 import engine.opcodes.Opcode;
 import engine.opcodes.Operator;
 import engine.opcodes.ReturnOp;
 import engine.opcodes.SleepOp;
+import engine.opcodes.StoreArrayElementOp;
 import engine.opcodes.StoreFieldOp;
 import engine.opcodes.StoreLocalOp;
 import engine.opcodes.YieldOp;
@@ -130,6 +133,18 @@ public class TestUtil {
 
         if ("store_field".equals(opName)) {
             return new StoreFieldOp(tokens[1]);
+        }
+
+        if ("load_array_element".equals(opName)) {
+            return new LoadArrayElementOp();
+        }
+
+        if ("store_array_element".equals(opName)) {
+            return new StoreArrayElementOp();
+        }
+
+        if ("new_array".equals(opName)) {
+            return new NewArrayOp(tokens[1], Integer.parseInt(tokens[2]));
         }
 
         throw new RuntimeException("Unrecognized opcode: " + opName);
@@ -311,5 +326,10 @@ public class TestUtil {
         Visitable ast = parser.parseClass();
         CompileVisitor v = new CompileVisitor();
         ast.accept(v);
+    }
+
+    public static void testCompileStatement(String code, String expectedDisassembly) {
+        Statement s = testParseStatement(code);
+        testCompileAST(s, expectedDisassembly);
     }
 }

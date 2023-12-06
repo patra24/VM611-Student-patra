@@ -1,6 +1,7 @@
 package ast.visitors;
 
 import ast.model.ArgumentList;
+import ast.model.ArraySelectorExpression;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
 import ast.model.ClassDefinition;
@@ -12,6 +13,7 @@ import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewArrayExpression;
 import ast.model.NewObjectExpression;
 import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
@@ -183,6 +185,30 @@ public abstract class AbstractVisitor implements Visitor {
 
     @Override
     public void visit(FieldDefinition field) {
+    }
+
+    @Override
+    public void betweenDimVisit(NewArrayExpression expr) {
+    }
+
+    @Override
+    public void postIndexVisit(ArraySelectorExpression expr) {
+    }
+
+    @Override
+    public void postVisit(ArraySelectorExpression expr) {
+    }
+
+    @Override
+    public void postVisit(NewArrayExpression expr) {
+    }
+
+    @Override
+    public void preVisit(ArraySelectorExpression expr) {
+    }
+
+    @Override
+    public void preVisit(NewArrayExpression expr) {
     }
 
 }

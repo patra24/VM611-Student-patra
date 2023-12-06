@@ -25,7 +25,7 @@ public class CallOp extends Opcode {
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
         int objId = opStack.pop();
-        HeapObject obj = heap.getEntry(objId);
+        HeapObject obj = (HeapObject) heap.getEntry(objId);
         Method method = CompiledClassCache.instance().resolveMethod(obj.getClazz().getName(), methodName);
 
         // Create a new locals map, and populate it with the method arguments.

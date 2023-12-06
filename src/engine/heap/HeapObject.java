@@ -9,8 +9,7 @@ import types.DataType;
 /**
  * HeapObject represents an object on the heap.
  */
-public class HeapObject {
-    private int id;
+public class HeapObject extends HeapEntry {
     private Clazz clazz;
     private Map<String, Integer> fieldValues;
 
@@ -21,15 +20,12 @@ public class HeapObject {
      * @param clazz the clazz
      */
     public HeapObject(int id, Clazz clazz) {
-        this.id = id;
+        super(id);
         this.clazz = clazz;
         this.fieldValues = new HashMap<>();
     }
 
-    public int getId() {
-        return id;
-    }
-
+    @Override
     public DataType getType() {
         return clazz.getType();
     }
@@ -38,17 +34,13 @@ public class HeapObject {
         return clazz;
     }
 
+    @Override
     public int getFieldValue(String name) {
         return fieldValues.get(name);
     }
 
     public void setFieldValue(String name, int value) {
         fieldValues.put(name, value);
-    }
-
-    @Override
-    public String toString() {
-        return clazz.getType() + "@" + id;
     }
 
 }

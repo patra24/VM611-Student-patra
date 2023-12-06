@@ -1,6 +1,7 @@
 package ast.visitors;
 
 import ast.model.ArgumentList;
+import ast.model.ArraySelectorExpression;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
 import ast.model.ClassDefinition;
@@ -12,6 +13,7 @@ import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewArrayExpression;
 import ast.model.NewObjectExpression;
 import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
@@ -96,6 +98,12 @@ public interface Visitor {
 
     void postTargetVisit(FieldAccessExpression expr);
 
+    void preVisit(ArraySelectorExpression expr);
+
+    void postIndexVisit(ArraySelectorExpression expr);
+
+    void postVisit(ArraySelectorExpression expr);
+
     void preVisit(ClassDefinition clazz);
 
     void postVisit(ClassDefinition clazz);
@@ -103,4 +111,10 @@ public interface Visitor {
     void preVisit(NewObjectExpression expr);
 
     void postVisit(NewObjectExpression expr);
+
+    void preVisit(NewArrayExpression expr);
+
+    void betweenDimVisit(NewArrayExpression expr);
+
+    void postVisit(NewArrayExpression expr);
 }

@@ -8,6 +8,8 @@ public class DataType {
     private BaseType baseType;
     /** The class name if this is an object */
     private String className;
+    /** Number of dimensions */
+    private int numDims;
 
     public DataType(String typeName) {
         switch (typeName) {
@@ -20,8 +22,39 @@ public class DataType {
         }
     }
 
+    public DataType(String typeName, int numDims) {
+        this(typeName);
+        this.numDims = numDims;
+    }
+
+    /**
+     * Copies a DataType.
+     *
+     * @param that the DataType to copy
+     */
+    public DataType(DataType that) {
+        baseType = that.baseType;
+        className = that.className;
+        numDims = that.numDims;
+    }
+
     public String getClassName() {
         return className;
+    }
+
+    /**
+     * Gets the type of the elements of this array type.
+     *
+     * @return the element type
+     */
+    public DataType getElementType() {
+        if (numDims == 0) {
+            throw new RuntimeException("Not an array type");
+        }
+
+        DataType elemType = new DataType(this);
+        elemType.numDims--;
+        return elemType;
     }
 
     @Override
@@ -31,7 +64,12 @@ public class DataType {
 
     @Override
     public String toString() {
-        return baseType == BaseType.OBJECT ? className : baseType.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(baseType == BaseType.OBJECT ? className : baseType);
+        for (int i = 0; i < numDims; i++) {
+            sb.append("[]");
+        }
+        return sb.toString();
     }
 
     public static DataType INT = new DataType("int");

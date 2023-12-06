@@ -3,6 +3,7 @@ package ast.visitors;
 import java.util.Stack;
 
 import ast.model.ArgumentList;
+import ast.model.ArraySelectorExpression;
 import ast.model.AssignStatement;
 import ast.model.BinaryExpression;
 import ast.model.ClassDefinition;
@@ -14,6 +15,7 @@ import ast.model.FieldDefinition;
 import ast.model.IfStatement;
 import ast.model.MethodCallExpression;
 import ast.model.MethodDefinition;
+import ast.model.NewArrayExpression;
 import ast.model.NewObjectExpression;
 import ast.model.NullExpression;
 import ast.model.ParameterDefinition;
@@ -37,6 +39,8 @@ public class PrintVisitor extends AbstractVisitor {
     private Stack<String> assignSnips = new Stack<>();
     /** Code snippets of method arguments */
     private Stack<String> methodArgumentSnips = new Stack<>();
+    /** Code snippets of array selectors */
+    private Stack<String> arraySelectorSnips = new Stack<>();
 
     @Override
     public void visit(ConstantExpression expr) {
@@ -146,8 +150,42 @@ public class PrintVisitor extends AbstractVisitor {
     }
 
     @Override
+    public void preVisit(ArraySelectorExpression expr) {
+        // We visit the array indices before the target, so start a snip to capture
+        // them.
+        startSnippet();
+    }
+
+    @Override
+    public void postIndexVisit(ArraySelectorExpression expr) {
+        // Capture the indices.
+        arraySelectorSnips.push(endSnippet());
+    }
+
+    @Override
+    public void postVisit(ArraySelectorExpression expr) {
+        // Use the captured indices.
+        sb.append('[').append(arraySelectorSnips.pop()).append(']');
+    }
+
+    @Override
     public void preVisit(NewObjectExpression expr) {
         sb.append("new ").append(expr.getClassName());
+    }
+
+    @Override
+    public void preVisit(NewArrayExpression expr) {
+        sb.append("new ").append(expr.getType()).append('[');
+    }
+
+    @Override
+    public void betweenDimVisit(NewArrayExpression expr) {
+        sb.append("][");
+    }
+
+    @Override
+    public void postVisit(NewArrayExpression expr) {
+        sb.append(']');
     }
 
     @Override

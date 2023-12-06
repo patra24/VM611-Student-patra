@@ -190,7 +190,7 @@ public class Part06Test extends TestBase {
     NewObjectOp op = new NewObjectOp("MyClass");
     op.execute(null, heap, opStack);
 
-    HeapObject obj = heap.getEntry(1);
+    HeapObject obj = (HeapObject) heap.getEntry(1);
     assertNotNull("should create HeapObject");
     assertEquals("createdHeapObject with incorrect type", "MyClass", obj.getClazz().getName());
     assertEquals("should push object id", 1, opStack.size());
