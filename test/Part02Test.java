@@ -9,6 +9,7 @@ import ast.model.ParameterDefinition;
 import engine.CompiledClassCache;
 import types.DataType;
 import types.Method;
+import types.Value;
 
 public class Part02Test extends TestBase {
     /**
@@ -18,12 +19,12 @@ public class Part02Test extends TestBase {
     public void testSimpleCodeStillWorks() {
         /** #score(5) */
         hintContext = "load_const, store_local";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 42, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 42, vars.get("a").getIntValue());
 
         hintContext = "binary operations";
         vars = TestUtil.testCode("""
@@ -35,7 +36,7 @@ public class Part02Test extends TestBase {
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 14, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 14, vars.get("a").getIntValue());
     }
 
     /**
@@ -45,7 +46,7 @@ public class Part02Test extends TestBase {
     public void testBranchingCodeStillWorks() {
         /** #score(5) */
         hintContext = "complicated example";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             0: load_const 0
             1: store_local a
             2: load_const 0
@@ -67,9 +68,9 @@ public class Part02Test extends TestBase {
             18: store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 5050, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 101, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 5050, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 101, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 
     @Test
@@ -91,7 +92,7 @@ public class Part02Test extends TestBase {
                 """));
         CompiledClassCache.instance().saveMethod("Main", foo);
 
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             new_object Main
             store_local o
             load_local o
@@ -109,11 +110,11 @@ public class Part02Test extends TestBase {
             store_local e
             """);
 
-        assertEquals(hint("local had wrong value"), (Integer) 5, vars.get("a"));
-        assertEquals(hint("local had wrong value"), (Integer) 5, vars.get("b"));
-        assertEquals(hint("local had wrong value"), (Integer) 234, vars.get("c"));
-        assertEquals(hint("local had wrong value"), (Integer) 5, vars.get("d"));
-        assertEquals(hint("local had wrong value"), (Integer) 123, vars.get("e"));
+        assertEquals(hint("local had wrong value"), 5, vars.get("a").getIntValue());
+        assertEquals(hint("local had wrong value"), 5, vars.get("b").getIntValue());
+        assertEquals(hint("local had wrong value"), 234, vars.get("c").getIntValue());
+        assertEquals(hint("local had wrong value"), 5, vars.get("d").getIntValue());
+        assertEquals(hint("local had wrong value"), 123, vars.get("e").getIntValue());
     }
 
     @Test
@@ -152,7 +153,7 @@ public class Part02Test extends TestBase {
                 """));
         CompiledClassCache.instance().saveMethod("Main", maxMethod);
 
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             new_object Main
             store_local o
             load_const 33
@@ -172,9 +173,9 @@ public class Part02Test extends TestBase {
             store_local z
             """);
 
-        assertEquals(hint("local had wrong value"), (Integer) 21, vars.get("x"));
-        assertEquals(hint("local had wrong value"), (Integer) 33, vars.get("y"));
-        assertEquals(hint("local had wrong value"), (Integer) 33, vars.get("z"));
+        assertEquals(hint("local had wrong value"), 21, vars.get("x").getIntValue());
+        assertEquals(hint("local had wrong value"), 33, vars.get("y").getIntValue());
+        assertEquals(hint("local had wrong value"), 33, vars.get("z").getIntValue());
     }
 
     @Test
@@ -212,7 +213,7 @@ public class Part02Test extends TestBase {
                 """));
         CompiledClassCache.instance().saveMethod("Main", fooMethod);
 
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             new_object Main
             store_local o
             load_const 12
@@ -222,7 +223,7 @@ public class Part02Test extends TestBase {
             store_local x
             """);
 
-        assertEquals(hint("local had wrong value"), (Integer) 78, vars.get("x"));
+        assertEquals(hint("local had wrong value"), 78, vars.get("x").getIntValue());
     }
 
     @Test
@@ -251,7 +252,7 @@ public class Part02Test extends TestBase {
                 """));
         CompiledClassCache.instance().saveMethod("Main", factorialMethod);
 
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             new_object Main
             store_local o
             load_const 3
@@ -264,8 +265,8 @@ public class Part02Test extends TestBase {
             store_local x
             """);
 
-        assertEquals(hint("local had wrong value"), (Integer) 6, vars.get("x"));
-        assertEquals(hint("local had wrong value"), (Integer) 24, vars.get("y"));
+        assertEquals(hint("local had wrong value"), 6, vars.get("x").getIntValue());
+        assertEquals(hint("local had wrong value"), 24, vars.get("y").getIntValue());
     }
 
     @Test
@@ -298,7 +299,7 @@ public class Part02Test extends TestBase {
                 """));
         CompiledClassCache.instance().saveMethod("Main", factorialMethod);
 
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             new_object Main
             store_local o
             load_const 5
@@ -311,7 +312,7 @@ public class Part02Test extends TestBase {
             store_local x
             """);
 
-        assertEquals(hint("local had wrong value"), (Integer) 5, vars.get("x"));
-        assertEquals(hint("local had wrong value"), (Integer) 13, vars.get("y"));
+        assertEquals(hint("local had wrong value"), 5, vars.get("x").getIntValue());
+        assertEquals(hint("local had wrong value"), 13, vars.get("y").getIntValue());
     }
 }

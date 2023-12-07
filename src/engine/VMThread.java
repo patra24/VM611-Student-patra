@@ -8,6 +8,7 @@ import engine.VMThreadState.State;
 import engine.heap.Heap;
 import engine.opcodes.Opcode;
 import types.Method;
+import types.Value;
 
 /**
  * A thread of execution in the VM.
@@ -16,11 +17,11 @@ public class VMThread {
     /** The method that will be executed when the thread starts */
     private Method entryPoint;
     /** The local variables for the entry point */
-    private Map<String, Integer> entryPointLocals;
+    private Map<String, Value> entryPointLocals;
     /** The thread's priority */
     private int priority;
     private Stack<StackFrame> callStack;
-    private Stack<Integer> opStack;
+    private Stack<Value> opStack;
     private Heap heap;
 
     public VMThread(String className, String entryPointName, Heap heap) {
@@ -68,7 +69,7 @@ public class VMThread {
      * 
      * @return the locals from the entry point
      */
-    public Map<String, Integer> run() {
+    public Map<String, Value> run() {
         VMThreadState state;
         do {
             state = runInstruction();
@@ -82,7 +83,7 @@ public class VMThread {
      * 
      * @return the locals from the entry point
      */
-    public Map<String, Integer> getEntryPointLocals() {
+    public Map<String, Value> getEntryPointLocals() {
         return entryPointLocals;
     }
 

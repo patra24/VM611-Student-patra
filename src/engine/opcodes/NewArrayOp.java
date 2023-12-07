@@ -6,6 +6,7 @@ import engine.StackFrame;
 import engine.heap.Heap;
 import engine.heap.HeapArray;
 import types.DataType;
+import types.Value;
 
 /**
  * Creates an array object, and puts its id on the stack.
@@ -20,7 +21,7 @@ public class NewArrayOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         int[] dims = new int[numDimensions];
         for (int i = numDimensions - 1; i >= 0; i--) {
             dims[i] = opStack.pop();

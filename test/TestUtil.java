@@ -38,6 +38,7 @@ import engine.opcodes.StoreFieldOp;
 import engine.opcodes.StoreLocalOp;
 import engine.opcodes.YieldOp;
 import types.Method;
+import types.Value;
 
 /**
  * Useful methods for testing.
@@ -215,7 +216,7 @@ public class TestUtil {
      * @param code the code
      * @return the local variables
      */
-    public static Map<String, Integer> testCode(String code) {
+    public static Map<String, Value> testCode(String code) {
         List<Opcode> ops = parseOpcodes(code);
         Method method = new Method("main", Collections.emptyList(), ops);
         CompiledClassCache.instance().saveMethod("Main", method);

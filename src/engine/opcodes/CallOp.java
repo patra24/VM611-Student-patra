@@ -11,6 +11,7 @@ import engine.StackFrame;
 import engine.heap.Heap;
 import engine.heap.HeapObject;
 import types.Method;
+import types.Value;
 
 /**
  * Calls a method.
@@ -23,7 +24,7 @@ public class CallOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         int objId = opStack.pop();
         HeapObject obj = (HeapObject) heap.getEntry(objId);
         Method method = CompiledClassCache.instance().resolveMethod(obj.getClazz().getName(), methodName);

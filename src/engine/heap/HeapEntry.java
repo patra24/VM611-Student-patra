@@ -1,6 +1,7 @@
 package engine.heap;
 
 import types.DataType;
+import types.Value;
 
 /**
  * HeapEntry is the base class for objects on the heap.
@@ -35,5 +36,5 @@ public abstract class HeapEntry {
      * @param name the field name
      * @return the value
      */
-    public abstract int getFieldValue(String name);
+    public abstract Value getFieldValue(String name);
 }

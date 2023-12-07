@@ -5,13 +5,14 @@ import java.util.Map;
 
 import types.Clazz;
 import types.DataType;
+import types.Value;
 
 /**
  * HeapObject represents an object on the heap.
  */
 public class HeapObject extends HeapEntry {
     private Clazz clazz;
-    private Map<String, Integer> fieldValues;
+    private Map<String, Value> fieldValues;
 
     /**
      * Creates a HeapObject.
@@ -35,11 +36,11 @@ public class HeapObject extends HeapEntry {
     }
 
     @Override
-    public int getFieldValue(String name) {
+    public Value getFieldValue(String name) {
         return fieldValues.get(name);
     }
 
-    public void setFieldValue(String name, int value) {
+    public void setFieldValue(String name, Value value) {
         fieldValues.put(name, value);
     }
 

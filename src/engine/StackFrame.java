@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import engine.opcodes.Opcode;
+import types.Value;
 
 /**
  * A frame in the call stack.
@@ -14,9 +15,9 @@ public class StackFrame {
     /** The opcodes for this method */
     private List<Opcode> opcodes;
     /** The local vars for this method */
-    private Map<String, Integer> localVars;
+    private Map<String, Value> localVars;
 
-    public StackFrame(List<Opcode> opcodes, Map<String, Integer> localVars) {
+    public StackFrame(List<Opcode> opcodes, Map<String, Value> localVars) {
         this.opcodes = opcodes;
         this.localVars = localVars;
     }
@@ -58,7 +59,7 @@ public class StackFrame {
      * 
      * @return the local variables
      */
-    public Map<String, Integer> getLocalVars() {
+    public Map<String, Value> getLocalVars() {
         return localVars;
     }
 

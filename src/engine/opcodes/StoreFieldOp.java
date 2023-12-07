@@ -5,6 +5,7 @@ import java.util.Stack;
 import engine.StackFrame;
 import engine.heap.Heap;
 import engine.heap.HeapObject;
+import types.Value;
 
 /**
  * Store a value from the stack into a field.
@@ -17,7 +18,7 @@ public class StoreFieldOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         int objId = opStack.pop();
         HeapObject object = (HeapObject) heap.getEntry(objId);
 

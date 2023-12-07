@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import types.Value;
+
 public class Part01Test extends TestBase {
 
     /**
@@ -15,12 +17,12 @@ public class Part01Test extends TestBase {
     public void testConstStore() {
         /** #score(5) */
         hintContext = "load_const, store_local";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 42, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 42, vars.get("a").getIntValue());
 
         vars = TestUtil.testCode("""
             load_const 12
@@ -29,8 +31,8 @@ public class Part01Test extends TestBase {
             store_local b
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 23, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 12, vars.get("b"));
+        assertEquals(hint("var had wrong value"), 23, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 12, vars.get("b").getIntValue());
     }
 
     /**
@@ -40,7 +42,7 @@ public class Part01Test extends TestBase {
     public void testLoadLocal() {
         /** #score(5) */
         hintContext = "load_local";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             load_const 13
             store_local d
@@ -51,10 +53,10 @@ public class Part01Test extends TestBase {
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 42, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 13, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 42, vars.get("c"));
-        assertEquals(hint("var had wrong value"), (Integer) 13, vars.get("d"));
+        assertEquals(hint("var had wrong value"), 42, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 13, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 42, vars.get("c").getIntValue());
+        assertEquals(hint("var had wrong value"), 13, vars.get("d").getIntValue());
     }
 
     /**
@@ -64,14 +66,14 @@ public class Part01Test extends TestBase {
     public void testAdd() {
         /** #score(1) */
         hintContext = "add";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             load_const 13
             add
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 55, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 55, vars.get("a").getIntValue());
 
         vars = new HashMap<>();
         vars = TestUtil.testCode("""
@@ -83,7 +85,7 @@ public class Part01Test extends TestBase {
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 64, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 64, vars.get("a").getIntValue());
     }
 
     /**
@@ -93,14 +95,14 @@ public class Part01Test extends TestBase {
     public void testSub() {
         /** #score(1) */
         hintContext = "sub";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             load_const 13
             sub
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 29, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 29, vars.get("a").getIntValue());
     }
 
     /**
@@ -110,14 +112,14 @@ public class Part01Test extends TestBase {
     public void testMul() {
         /** #score(1) */
         hintContext = "mul";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 4
             load_const 13
             mul
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 52, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 52, vars.get("a").getIntValue());
     }
 
     /**
@@ -127,14 +129,14 @@ public class Part01Test extends TestBase {
     public void testDiv() {
         /** #score(1) */
         hintContext = "div";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             load_const 7
             div
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 6, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 6, vars.get("a").getIntValue());
     }
 
     /**
@@ -144,14 +146,14 @@ public class Part01Test extends TestBase {
     public void testMod() {
         /** #score(1) */
         hintContext = "mod";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 42
             load_const 5
             mod
             store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer)2, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 2, vars.get("a").getIntValue());
     }
 
     /**
@@ -161,7 +163,7 @@ public class Part01Test extends TestBase {
     public void testEq() {
         /** #score(1) */
         hintContext = "cmpEQ";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 9
             load_const 10
             cmpEQ
@@ -176,9 +178,9 @@ public class Part01Test extends TestBase {
             store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 0, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 0, vars.get("c").getIntValue());
     }
 
     /**
@@ -188,7 +190,7 @@ public class Part01Test extends TestBase {
     public void testNe() {
         /** #score(1) */
         hintContext = "cmpNEQ";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 9
             load_const 10
             cmpNEQ
@@ -203,9 +205,9 @@ public class Part01Test extends TestBase {
             store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 1, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 0, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 
     /**
@@ -215,7 +217,7 @@ public class Part01Test extends TestBase {
     public void testLt() {
         /** #score(1) */
         hintContext = "cmpLT";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 9
             load_const 10
             cmpLT
@@ -230,9 +232,9 @@ public class Part01Test extends TestBase {
             store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 1, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 0, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 0, vars.get("c").getIntValue());
     }
 
     /**
@@ -242,7 +244,7 @@ public class Part01Test extends TestBase {
     public void testLte() {
         /** #score(1) */
         hintContext = "cmpLTE";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 9
             load_const 10
             cmpLTE
@@ -257,9 +259,9 @@ public class Part01Test extends TestBase {
             store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 1, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 0, vars.get("c").getIntValue());
     }
 
     /**
@@ -269,7 +271,7 @@ public class Part01Test extends TestBase {
     public void testGt() {
         /** #score(1) */
         hintContext = "cmpGT";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 9
             load_const 10
             cmpGT
@@ -284,9 +286,9 @@ public class Part01Test extends TestBase {
             store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 0, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 0, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 
     /**
@@ -296,7 +298,7 @@ public class Part01Test extends TestBase {
     public void testGte() {
         /** #score(1) */
         hintContext = "cmpGTE";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             load_const 9
             load_const 10
             cmpGTE
@@ -311,9 +313,9 @@ public class Part01Test extends TestBase {
             store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 0, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 0, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 
     /**
@@ -323,14 +325,14 @@ public class Part01Test extends TestBase {
     public void testBranch() {
         /** #score(4) */
         hintContext = "branch";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             0: load_const 12
             1: branch 3
             2: load_const 23
             3: store_local a
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 12, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 12, vars.get("a").getIntValue());
     }
 
     /**
@@ -340,7 +342,7 @@ public class Part01Test extends TestBase {
     public void testBranchT() {
         /** #score(4) */
         hintContext = "branchT";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             0: load_const 0
             1: branchT 4
             2: load_const 1
@@ -353,9 +355,9 @@ public class Part01Test extends TestBase {
             9: store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer)1, vars.get("a"));
+        assertEquals(hint("var had wrong value"), 1, vars.get("a").getIntValue());
         assertNull(hint("var had wrong value"), vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer)1, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 
     /**
@@ -365,7 +367,7 @@ public class Part01Test extends TestBase {
     public void testBranchF() {
         /** #score(4) */
         hintContext = "branchF";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             0: load_const 0
             1: branchF 4
             2: load_const 1
@@ -378,9 +380,9 @@ public class Part01Test extends TestBase {
             9: store_local c
             """);
 
-        assertNull(hint("var had wrong value"),  vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer)1, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer)1, vars.get("c"));
+        assertNull(hint("var had wrong value"), vars.get("a"));
+        assertEquals(hint("var had wrong value"), 1, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 
     /**
@@ -390,7 +392,7 @@ public class Part01Test extends TestBase {
     public void testLoop() {
         /** #score(2) */
         hintContext = "complicated example";
-        Map<String, Integer> vars = TestUtil.testCode("""
+        Map<String, Value> vars = TestUtil.testCode("""
             0: load_const 0
             1: store_local a
             2: load_const 0
@@ -412,8 +414,8 @@ public class Part01Test extends TestBase {
             18: store_local c
             """);
 
-        assertEquals(hint("var had wrong value"), (Integer) 5050, vars.get("a"));
-        assertEquals(hint("var had wrong value"), (Integer) 101, vars.get("b"));
-        assertEquals(hint("var had wrong value"), (Integer) 1, vars.get("c"));
+        assertEquals(hint("var had wrong value"), 5050, vars.get("a").getIntValue());
+        assertEquals(hint("var had wrong value"), 101, vars.get("b").getIntValue());
+        assertEquals(hint("var had wrong value"), 1, vars.get("c").getIntValue());
     }
 }

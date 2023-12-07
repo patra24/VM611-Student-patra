@@ -24,6 +24,9 @@ import engine.opcodes.LoadFieldOp;
 import engine.opcodes.NewObjectOp;
 import engine.opcodes.StoreFieldOp;
 import types.Clazz;
+import types.DataType;
+import types.Field;
+import types.Value;
 
 public class Part06Test extends TestBase {
 
@@ -167,17 +170,19 @@ public class Part06Test extends TestBase {
   public void testHeapObject() {
     /** #score(2) */
     Clazz clazz = new Clazz("MyClass");
+    clazz.addField(new Field("f1", DataType.INT));
+    clazz.addField(new Field("f2", DataType.INT));
     HeapObject obj = new HeapObject(1, clazz);
     assertEquals("returned wrong id", 1, obj.getId());
     assertSame("returned wrong clazz", clazz, obj.getClazz());
 
-    obj.setFieldValue("f1", 1);
-    obj.setFieldValue("f2", 2);
-    assertEquals("field value incorrect", 1, obj.getFieldValue("f1"));
-    assertEquals("field value incorrect", 2, obj.getFieldValue("f2"));
+    obj.setFieldValue("f1", new Value(1));
+    obj.setFieldValue("f2", new Value(2));
+    assertEquals("field value incorrect", 1, obj.getFieldValue("f1").getIntValue());
+    assertEquals("field value incorrect", 2, obj.getFieldValue("f2").getIntValue());
 
-    obj.setFieldValue("f1", 3);
-    assertEquals("updated field value incorrect", 3, obj.getFieldValue("f1"));
+    obj.setFieldValue("f1", new Value(3));
+    assertEquals("updated field value incorrect", 3, obj.getFieldValue("f1").getIntValue());
   }
 
   @Test
@@ -186,7 +191,7 @@ public class Part06Test extends TestBase {
     Heap heap = new Heap();
     Clazz myClass = new Clazz("MyClass");
     CompiledClassCache.instance().saveClass(myClass);
-    Stack<Integer> opStack = new Stack<>();
+    Stack<Value> opStack = new Stack<>();
     NewObjectOp op = new NewObjectOp("MyClass");
     op.execute(null, heap, opStack);
 
@@ -194,71 +199,75 @@ public class Part06Test extends TestBase {
     assertNotNull("should create HeapObject");
     assertEquals("createdHeapObject with incorrect type", "MyClass", obj.getClazz().getName());
     assertEquals("should push object id", 1, opStack.size());
-    assertEquals("pushed incorrect object id", (Integer) 1, opStack.pop());
+    assertEquals("pushed incorrect object id", 1, opStack.pop().getIntValue());
   }
 
   @Test
   public void testLoadFieldOp() {
     /** #score(2) */
     Heap heap = new Heap();
-    Stack<Integer> opStack = new Stack<>();
+    Stack<Value> opStack = new Stack<>();
 
     Clazz myClass = new Clazz("MyClass");
+    myClass.addField(new Field("f1", DataType.INT));
+    myClass.addField(new Field("f2", DataType.INT));
     HeapObject obj = heap.createObject(myClass);
-    obj.setFieldValue("f1", 11);
-    obj.setFieldValue("f2", 12);
+    obj.setFieldValue("f1", new Value(11));
+    obj.setFieldValue("f2", new Value(12));
     HeapObject obj2 = heap.createObject(myClass);
-    obj2.setFieldValue("f1", 21);
-    obj2.setFieldValue("f2", 22);
+    obj2.setFieldValue("f1", new Value(21));
+    obj2.setFieldValue("f2", new Value(22));
 
-    opStack.push(obj.getId());
+    opStack.push(new Value(obj.getId(), myClass.getType()));
     new LoadFieldOp("f1").execute(null, heap, opStack);
     assertEquals("opStack is wrong size", 1, opStack.size());
-    assertEquals("field value should be on opStack", (Integer) 11, opStack.pop());
+    assertEquals("field value should be on opStack", 11, opStack.pop().getIntValue());
 
-    opStack.push(obj2.getId());
+    opStack.push(new Value(obj2));
     new LoadFieldOp("f1").execute(null, heap, opStack);
-    opStack.push(obj.getId());
+    opStack.push(new Value(obj));
     new LoadFieldOp("f2").execute(null, heap, opStack);
-    opStack.push(obj2.getId());
+    opStack.push(new Value(obj2));
     new LoadFieldOp("f2").execute(null, heap, opStack);
     assertEquals("opStack is wrong size", 3, opStack.size());
-    assertEquals("field value should be on opStack", (Integer) 22, opStack.pop());
-    assertEquals("field value should be on opStack", (Integer) 12, opStack.pop());
-    assertEquals("field value should be on opStack", (Integer) 21, opStack.pop());
+    assertEquals("field value should be on opStack", 22, opStack.pop().getIntValue());
+    assertEquals("field value should be on opStack", 12, opStack.pop().getIntValue());
+    assertEquals("field value should be on opStack", 21, opStack.pop().getIntValue());
   }
 
   @Test
   public void testStoreFieldOp() {
     /** #score(2) */
     Heap heap = new Heap();
-    Stack<Integer> opStack = new Stack<>();
+    Stack<Value> opStack = new Stack<>();
 
     Clazz myClass = new Clazz("MyClass");
+    myClass.addField(new Field("f1", DataType.INT));
+    myClass.addField(new Field("f2", DataType.INT));
     HeapObject obj = heap.createObject(myClass);
     HeapObject obj2 = heap.createObject(myClass);
 
-    opStack.push(11);
-    opStack.push(obj.getId());
-    opStack.push(22);
-    opStack.push(obj2.getId());
-    opStack.push(21);
-    opStack.push(obj2.getId());
-    opStack.push(12);
-    opStack.push(obj.getId());
+    opStack.push(new Value(11));
+    opStack.push(new Value(obj));
+    opStack.push(new Value(22));
+    opStack.push(new Value(obj2));
+    opStack.push(new Value(21));
+    opStack.push(new Value(obj2));
+    opStack.push(new Value(12));
+    opStack.push(new Value(obj));
 
     new StoreFieldOp("f2").execute(null, heap, opStack);
     assertEquals("opStack is wrong size", 6, opStack.size());
-    assertEquals("field value not set", 12, obj.getFieldValue("f2"));
+    assertEquals("field value not set", 12, obj.getFieldValue("f2").getIntValue());
 
     new StoreFieldOp("f1").execute(null, heap, opStack);
     new StoreFieldOp("f2").execute(null, heap, opStack);
     new StoreFieldOp("f1").execute(null, heap, opStack);
 
     assertEquals("opStack is wrong size", 0, opStack.size());
-    assertEquals("field value not set", 11, obj.getFieldValue("f1"));
-    assertEquals("field value not set", 12, obj.getFieldValue("f2"));
-    assertEquals("field value not set", 22, obj2.getFieldValue("f2"));
+    assertEquals("field value not set", 11, obj.getFieldValue("f1").getIntValue());
+    assertEquals("field value not set", 12, obj.getFieldValue("f2").getIntValue());
+    assertEquals("field value not set", 22, obj2.getFieldValue("f2").getIntValue());
   }
 
   @Test
@@ -342,13 +351,13 @@ public class Part06Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
     assertNotNull(hint("new expr didn't create object"), heap.getEntry(1));
-    int obj = locals.get("obj");
+    Value obj = locals.get("obj");
     assertNotNull(hint("new assignment didn't store object"), obj);
-    assertEquals(hint("method call result incorrect"), (Integer) 5, locals.get("a"));
-    assertEquals(hint("method call result incorrect"), (Integer) 12, locals.get("b"));
+    assertEquals(hint("method call result incorrect"), 5, locals.get("a").getIntValue());
+    assertEquals(hint("method call result incorrect"), 12, locals.get("b").getIntValue());
   }
 
   @Test
@@ -506,15 +515,15 @@ public class Part06Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Box", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    HeapObject obj = (HeapObject) heap.getEntry(locals.get("a"));
+    HeapObject obj = (HeapObject) heap.getEntry(locals.get("a").getIntValue());
     assertEquals(hint("object type incorrect"), "Box", obj.getClazz().getName());
-    int x = obj.getFieldValue("x");
-    assertEquals(hint("field value incorrect"), 3, x);
-    obj = (HeapObject) heap.getEntry(locals.get("b"));
+    Value x = obj.getFieldValue("x");
+    assertEquals(hint("field value incorrect"), 3, x.getIntValue());
+    obj = (HeapObject) heap.getEntry(locals.get("b").getIntValue());
     x = obj.getFieldValue("x");
-    assertEquals(hint("field value incorrect"), 5, x);
+    assertEquals(hint("field value incorrect"), 5, x.getIntValue());
   }
 
   @Test
@@ -561,13 +570,13 @@ public class Part06Test extends TestBase {
 
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
     e.run();
 
-    assertEquals(hint("object variable has incorrect value"), (Integer) 1, locals.get("o"));
+    assertEquals(hint("object variable has incorrect value"), 1, locals.get("o").getIntValue());
     HeapObject obj = (HeapObject) heap.getEntry(1);
-    assertEquals(hint("field value incorrect"), 3, obj.getFieldValue("x"));
-    assertEquals(hint("field value incorrect"), 5, obj.getFieldValue("y"));
+    assertEquals(hint("field value incorrect"), 3, obj.getFieldValue("x").getIntValue());
+    assertEquals(hint("field value incorrect"), 5, obj.getFieldValue("y").getIntValue());
   }
 
   @Test
@@ -665,12 +674,12 @@ public class Part06Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
-    assertEquals("node height incorrect", (Integer) 4, locals.get("rh"));
-    assertEquals("node height incorrect", (Integer) 3, locals.get("h5"));
-    assertEquals("node height incorrect", (Integer) 2, locals.get("h2"));
-    assertEquals("node height incorrect", (Integer) 2, locals.get("h17"));
-    assertEquals("node height incorrect", (Integer) 1, locals.get("h13"));
+    Map<String, Value> locals = e.getEntryPointLocals();
+    assertEquals("node height incorrect", 4, locals.get("rh").getIntValue());
+    assertEquals("node height incorrect", 3, locals.get("h5").getIntValue());
+    assertEquals("node height incorrect", 2, locals.get("h2").getIntValue());
+    assertEquals("node height incorrect", 2, locals.get("h17").getIntValue());
+    assertEquals("node height incorrect", 1, locals.get("h13").getIntValue());
   }
 
 }

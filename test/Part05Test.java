@@ -11,6 +11,7 @@ import org.junit.Test;
 import engine.PriorityScheduler;
 import engine.VMThread;
 import engine.heap.Heap;
+import types.Value;
 
 public class Part05Test extends TestBase {
 
@@ -29,7 +30,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -45,7 +46,7 @@ public class Part05Test extends TestBase {
 
         scheduler.run(1);
         assertEquals(hint("symbol table contains wrong number of entries"), 1, t1Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
 
         scheduler.run(3);
         assertEquals(hint("symbol table contains wrong number of entries"), 1, t1Symbols.size());
@@ -53,8 +54,8 @@ public class Part05Test extends TestBase {
 
         scheduler.run(1);
         assertEquals(hint("symbol table contains wrong number of entries"), 2, t1Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("symbol didn't have expected value"), 8, (int) t1Symbols.get("y"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("symbol didn't have expected value"), 8, t1Symbols.get("y").getIntValue());
         assertNull(hint("getCurrentThread should return null"), scheduler.getCurrentThread());
     }
 
@@ -72,7 +73,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -80,7 +81,7 @@ public class Part05Test extends TestBase {
             store_local z
             """);
         VMThread t2 = new VMThread("Main", "t2", heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -98,16 +99,16 @@ public class Part05Test extends TestBase {
         scheduler.run(1);
         assertEquals(hint("t1 t1 symbol table contains wrong number of entries"), 2, t1Symbols.size());
         assertEquals(hint("t1 symbol didn't have expected value after completion"), 5,
-            (int) t1Symbols.get("x"));
+            t1Symbols.get("x").getIntValue());
         assertEquals(hint("t1 symbol didn't have expected value after completion"), 7,
-            (int) t1Symbols.get("y"));
+            t1Symbols.get("y").getIntValue());
         assertSame(hint("didn't switch to second thread after first completed"), t2, scheduler.getCurrentThread());
 
         scheduler.run(2);
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t1 symbol didn't have expected value"), 7, (int) t1Symbols.get("y"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t1 symbol didn't have expected value"), 7, t1Symbols.get("y").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
         assertNull(hint("current thread should be null after all threads complete"), scheduler.getCurrentThread());
     }
 
@@ -126,7 +127,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -135,7 +136,7 @@ public class Part05Test extends TestBase {
             yield
             """);
         VMThread t2 = new VMThread("Main", "t2", heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -149,7 +150,7 @@ public class Part05Test extends TestBase {
 
         scheduler.run(2);
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 1, t1Symbols.size());
-        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
+        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
         assertSame(hint("current thread changed prematurely"), t1, scheduler.getCurrentThread());
 
         scheduler.run(1);
@@ -159,8 +160,8 @@ public class Part05Test extends TestBase {
         assertSame(hint("current thread changed prematurely"), t2, scheduler.getCurrentThread());
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 1, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
 
         scheduler.run(1);
         assertSame(hint("yield didn't change back to first thread"), t1, scheduler.getCurrentThread());
@@ -168,9 +169,9 @@ public class Part05Test extends TestBase {
 
         scheduler.run(2);
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 2, t1Symbols.size());
-        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t1 symbol didn't have expected value"), 7, (int) t1Symbols.get("y"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t1 symbol didn't have expected value"), 7, t1Symbols.get("y").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
     }
 
     /** Test sleep. */
@@ -187,7 +188,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -195,7 +196,7 @@ public class Part05Test extends TestBase {
             store_local z
             """);
         VMThread t2 = new VMThread("Main", "t2", heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -219,9 +220,9 @@ public class Part05Test extends TestBase {
         scheduler.run(2);
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 2, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t1 symbol didn't have expected value"), 7, (int) t1Symbols.get("y"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t1 symbol didn't have expected value"), 7, t1Symbols.get("y").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
     }
 
     /** Test sleep. */
@@ -238,7 +239,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -246,7 +247,7 @@ public class Part05Test extends TestBase {
             store_local z
             """);
         VMThread t2 = new VMThread("Main", "t2", heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -270,9 +271,9 @@ public class Part05Test extends TestBase {
         scheduler.run(2);
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 2, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t1 symbol didn't have expected value"), 7, (int) t1Symbols.get("y"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t1 symbol didn't have expected value"), 7, t1Symbols.get("y").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
     }
 
     /** Test sleep. */
@@ -287,7 +288,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -296,7 +297,7 @@ public class Part05Test extends TestBase {
             store_local z
             """);
         VMThread t2 = new VMThread("Main", "t2", heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -325,8 +326,8 @@ public class Part05Test extends TestBase {
         assertNull(hint("current thread should be null after threads complete"), scheduler.getCurrentThread());
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 1, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
     }
 
     /** Test priorities. */
@@ -340,7 +341,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", 0, heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -348,7 +349,7 @@ public class Part05Test extends TestBase {
             store_local z
             """);
         VMThread t2 = new VMThread("Main", "t2", 1, heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -367,8 +368,8 @@ public class Part05Test extends TestBase {
         assertNull(hint("current thread should be null"), scheduler.getCurrentThread());
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 1, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
     }
 
     /** Test priorities. */
@@ -383,7 +384,7 @@ public class Part05Test extends TestBase {
             """);
         Heap heap = new Heap();
         VMThread t1 = new VMThread("Main", "t1", 0, heap);
-        Map<String, Integer> t1Symbols = t1.getEntryPointLocals();
+        Map<String, Value> t1Symbols = t1.getEntryPointLocals();
         t1Symbols.remove("this");
 
         TestUtil.compileMethod("Main", "t2", """
@@ -392,7 +393,7 @@ public class Part05Test extends TestBase {
             store_local z
             """);
         VMThread t2 = new VMThread("Main", "t2", 1, heap);
-        Map<String, Integer> t2Symbols = t2.getEntryPointLocals();
+        Map<String, Value> t2Symbols = t2.getEntryPointLocals();
         t2Symbols.remove("this");
 
         List<VMThread> threadList = new ArrayList<VMThread>();
@@ -415,14 +416,14 @@ public class Part05Test extends TestBase {
         scheduler.run(1);
         assertSame(hint("current thread wrong after thread ended"), t1, scheduler.getCurrentThread());
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
 
         scheduler.run(1);
         assertNull(hint("current thread should be null"), scheduler.getCurrentThread());
         assertEquals(hint("t1 symbol table contains wrong number of entries"), 1, t1Symbols.size());
         assertEquals(hint("t2 symbol table contains wrong number of entries"), 1, t2Symbols.size());
-        assertEquals(hint("t1 symbol didn't have expected value"), 5, (int) t1Symbols.get("x"));
-        assertEquals(hint("t2 symbol didn't have expected value"), 6, (int) t2Symbols.get("z"));
+        assertEquals(hint("t1 symbol didn't have expected value"), 5, t1Symbols.get("x").getIntValue());
+        assertEquals(hint("t2 symbol didn't have expected value"), 6, t2Symbols.get("z").getIntValue());
     }
 
 }

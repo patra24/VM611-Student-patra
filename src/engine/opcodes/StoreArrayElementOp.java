@@ -5,6 +5,7 @@ import java.util.Stack;
 import engine.StackFrame;
 import engine.heap.Heap;
 import engine.heap.HeapArray;
+import types.Value;
 
 /**
  * Stores a value from the stack into an array element.
@@ -12,7 +13,7 @@ import engine.heap.HeapArray;
 public class StoreArrayElementOp extends Opcode {
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         int arrayId = opStack.pop();
         HeapArray arr = (HeapArray) heap.getEntry(arrayId);
         int index = opStack.pop();

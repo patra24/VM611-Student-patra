@@ -42,6 +42,10 @@ public class DataType {
         return className;
     }
 
+    public int getNumDims() {
+        return numDims;
+    }
+
     /**
      * Gets the type of the elements of this array type.
      *
@@ -55,6 +59,15 @@ public class DataType {
         DataType elemType = new DataType(this);
         elemType.numDims--;
         return elemType;
+    }
+
+    /**
+     * Returns true if this is an object type (arrays are objects).
+     * 
+     * @return true if this is an object type
+     */
+    public boolean isObject() {
+        return baseType == BaseType.OBJECT || numDims > 0;
     }
 
     @Override

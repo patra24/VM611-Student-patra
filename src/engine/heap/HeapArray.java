@@ -1,13 +1,14 @@
 package engine.heap;
 
 import types.DataType;
+import types.Value;
 
 /**
  * HeapArray represents an array on the heap.
  */
 public class HeapArray extends HeapEntry {
     private DataType type;
-    private int[] data;
+    private Value[] data;
 
     /**
      * Creates an array. This is always a one-dimensional array. Multiple HeapArrays
@@ -20,7 +21,7 @@ public class HeapArray extends HeapEntry {
     public HeapArray(int id, DataType type, int length) {
         super(id);
         this.type = type;
-        this.data = new int[length];
+        this.data = new Value[length];
     }
 
     /**
@@ -29,7 +30,7 @@ public class HeapArray extends HeapEntry {
      * @param index the index
      * @return the value
      */
-    public int getAt(int index) {
+    public Value getAt(int index) {
         return data[index];
     }
 
@@ -39,7 +40,7 @@ public class HeapArray extends HeapEntry {
      * @param index the index
      * @param value the value
      */
-    public void setAt(int index, int value) {
+    public void setAt(int index, Value value) {
         data[index] = value;
     }
 
@@ -58,7 +59,7 @@ public class HeapArray extends HeapEntry {
     }
 
     @Override
-    public int getFieldValue(String name) {
+    public Value getFieldValue(String name) {
         if ("length".equals(name)) {
             return data.length;
         }

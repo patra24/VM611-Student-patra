@@ -9,6 +9,7 @@ import engine.VMThread;
 import engine.heap.Heap;
 import engine.heap.HeapArray;
 import types.DataType;
+import types.Value;
 
 public class Part07Test extends TestBase {
 
@@ -128,13 +129,13 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int arrId = locals.get("a");
-    HeapArray a = (HeapArray) heap.getEntry(arrId);
+    Value arrId = locals.get("a");
+    HeapArray a = (HeapArray) heap.getEntry(arrId.getIntValue());
     assertNotNull(hint("array wasn't created"), a);
     assertEquals(hint("array had wrong type"), "int[]", a.getType().toString());
-    checkArrayDims(arrId, heap, "int", 5);
+    checkArrayDims(arrId.getIntValue(), heap, "int", 5);
   }
 
   @Test
@@ -161,13 +162,13 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int arrId = locals.get("a");
-    HeapArray a = (HeapArray) heap.getEntry(arrId);
+    Value arrId = locals.get("a");
+    HeapArray a = (HeapArray) heap.getEntry(arrId.getIntValue());
     assertNotNull(hint("array wasn't created"), a);
     assertEquals(hint("array had wrong type"), "MyClass[]", a.getType().toString());
-    checkArrayDims(arrId, heap, "MyClass", 5);
+    checkArrayDims(arrId.getIntValue(), heap, "MyClass", 5);
   }
 
   @Test
@@ -213,10 +214,10 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    checkArrayDims(locals.get("a"), heap, "int", 5);
-    checkArrayVals(locals.get("a"), heap, new DataType("int", 1), new Integer[] { 13, 0, 29, 0, 21 });
+    checkArrayDims(locals.get("a").getIntValue(), heap, "int", 5);
+    checkArrayVals(locals.get("a").getIntValue(), heap, new DataType("int", 1), new Integer[] { 13, 0, 29, 0, 21 });
   }
 
   @Test
@@ -247,10 +248,10 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int x = locals.get("x");
-    assertEquals(hint("array length incorrect"), 13, x);
+    Value x = locals.get("x");
+    assertEquals(hint("array length incorrect"), 13, x.getIntValue());
   }
 
   @Test
@@ -309,13 +310,13 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int arrId = locals.get("a");
-    HeapArray a = (HeapArray) heap.getEntry(arrId);
+    Value arrId = locals.get("a");
+    HeapArray a = (HeapArray) heap.getEntry(arrId.getIntValue());
     assertNotNull(hint("array wasn't created"), a);
     assertEquals(hint("array had wrong type"), "int[][]", a.getType().toString());
-    checkArrayDims(locals.get("a"), heap, "int", 5, 4);
+    checkArrayDims(locals.get("a").getIntValue(), heap, "int", 5, 4);
   }
 
   @Test
@@ -343,13 +344,13 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int arrId = locals.get("a");
-    HeapArray a = (HeapArray) heap.getEntry(arrId);
+    Value arrId = locals.get("a");
+    HeapArray a = (HeapArray) heap.getEntry(arrId.getIntValue());
     assertNotNull(hint("array wasn't created"), a);
     assertEquals(hint("array had wrong type"), "MyClass[][]", a.getType().toString());
-    checkArrayDims(locals.get("a"), heap, "MyClass", 5, 4);
+    checkArrayDims(locals.get("a").getIntValue(), heap, "MyClass", 5, 4);
   }
 
   @Test
@@ -379,13 +380,13 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int arrId = locals.get("a");
-    HeapArray a = (HeapArray) heap.getEntry(arrId);
+    Value arrId = locals.get("a");
+    HeapArray a = (HeapArray) heap.getEntry(arrId.getIntValue());
     assertNotNull(hint("array wasn't created"), a);
     assertEquals(hint("array had wrong type"), "int[][][][]", a.getType().toString());
-    checkArrayDims(locals.get("a"), heap, "int", 5, 4, 3, 2);
+    checkArrayDims(locals.get("a").getIntValue(), heap, "int", 5, 4, 3, 2);
   }
 
   @Test
@@ -415,13 +416,13 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int arrId = locals.get("a");
-    HeapArray a = (HeapArray) heap.getEntry(arrId);
+    Value arrId = locals.get("a");
+    HeapArray a = (HeapArray) heap.getEntry(arrId.getIntValue());
     assertNotNull(hint("array wasn't created"), a);
     assertEquals(hint("array had wrong type"), "MyClass[][][][]", a.getType().toString());
-    checkArrayDims(locals.get("a"), heap, "MyClass", 5, 4, 2, 3);
+    checkArrayDims(locals.get("a").getIntValue(), heap, "MyClass", 5, 4, 2, 3);
   }
 
   @Test
@@ -509,10 +510,10 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    checkArrayDims(locals.get("a"), heap, "int", 3, 2);
-    checkArrayVals(locals.get("a"), heap, new DataType("int", 2),
+    checkArrayDims(locals.get("a").getIntValue(), heap, "int", 3, 2);
+    checkArrayVals(locals.get("a").getIntValue(), heap, new DataType("int", 2),
       new Integer[][] { { 3, 13 }, { 5, 0 }, { 0, 0 } });
   }
 
@@ -560,14 +561,14 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int x = locals.get("x");
-    assertEquals(hint("base array length incorrect"), 3, x);
-    int y = locals.get("y");
-    assertEquals(hint("sub-array length incorrect"), 2, y);
-    int z = locals.get("z");
-    assertEquals(hint("sub-sub-array length incorrect"), 4, z);
+    Value x = locals.get("x");
+    assertEquals(hint("base array length incorrect"), 3, x.getIntValue());
+    Value y = locals.get("y");
+    assertEquals(hint("sub-array length incorrect"), 2, y.getIntValue());
+    Value z = locals.get("z");
+    assertEquals(hint("sub-sub-array length incorrect"), 4, z.getIntValue());
   }
 
   @Test
@@ -637,16 +638,16 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int x = locals.get("x");
-    assertEquals(hint("base array length incorrect"), 3, x);
-    int y = locals.get("y");
-    assertEquals(hint("sub-array length incorrect"), 2, y);
-    int z = locals.get("z");
-    assertEquals(hint("nested field value incorrect"), 13, z);
-    int b = locals.get("b");
-    assertEquals(hint("nested method return value incorrect"), 13, b);
+    Value x = locals.get("x");
+    assertEquals(hint("base array length incorrect"), 3, x.getIntValue());
+    Value y = locals.get("y");
+    assertEquals(hint("sub-array length incorrect"), 2, y.getIntValue());
+    Value z = locals.get("z");
+    assertEquals(hint("nested field value incorrect"), 13, z.getIntValue());
+    Value b = locals.get("b");
+    assertEquals(hint("nested method return value incorrect"), 13, b.getIntValue());
   }
 
   private void checkArrayDims(int arrId, int index, Heap heap, String elemType, int... dims) {
@@ -655,8 +656,8 @@ public class Part07Test extends TestBase {
     assertEquals(hint("array length incorrect"), dims[index], arr.getLength());
     if (index < dims.length - 1) {
       for (int i = 0; i < dims[index]; i++) {
-        int sub = arr.getAt(i);
-        checkArrayDims(sub, index + 1, heap, elemType, dims);
+        Value sub = arr.getAt(i);
+        checkArrayDims(sub.getIntValue(), index + 1, heap, elemType, dims);
       }
     }
   }
@@ -674,13 +675,13 @@ public class Part07Test extends TestBase {
     DataType expectedElemType = expectedType.getElementType();
     if (vals instanceof Integer[]) {
       for (int i = 0; i < vals.length; i++) {
-        int elem = arr.getAt(i);
-        assertEquals(hint("array value at index " + i + " incorrect"), vals[i], elem);
+        Value elem = arr.getAt(i);
+        assertEquals(hint("array value at index " + i + " incorrect"), vals[i], elem.getIntValue());
       }
     } else {
       for (int i = 0; i < vals.length; i++) {
-        int subArrId = arr.getAt(i);
-        checkArrayVals(subArrId, heap, expectedElemType, (Object[]) vals[i]);
+        Value subArrId = arr.getAt(i);
+        checkArrayVals(subArrId.getIntValue(), heap, expectedElemType, (Object[]) vals[i]);
       }
     }
   }
@@ -747,9 +748,9 @@ public class Part07Test extends TestBase {
     Heap heap = new Heap();
     VMThread e = new VMThread("Main", "main", heap);
     e.run();
-    Map<String, Integer> locals = e.getEntryPointLocals();
+    Map<String, Value> locals = e.getEntryPointLocals();
 
-    int values = locals.get("values");
-    checkArrayVals(values, heap, new DataType("int", 1), new Integer[] { 10, 5, 2, 3, 8, 17, 13 });
+    Value values = locals.get("values");
+    checkArrayVals(values.getIntValue(), heap, new DataType("int", 1), new Integer[] { 10, 5, 2, 3, 8, 17, 13 });
   }
 }

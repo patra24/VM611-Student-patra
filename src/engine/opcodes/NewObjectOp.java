@@ -7,6 +7,7 @@ import engine.StackFrame;
 import engine.heap.Heap;
 import engine.heap.HeapObject;
 import types.Clazz;
+import types.Value;
 
 /**
  * Creates an object, and puts its id on the stack.
@@ -19,7 +20,7 @@ public class NewObjectOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         Clazz classDef = CompiledClassCache.instance().resolveClass(className);
         HeapObject newObj = heap.createObject(classDef);
         opStack.push(newObj.getId());

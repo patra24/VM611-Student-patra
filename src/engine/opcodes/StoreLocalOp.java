@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import engine.StackFrame;
 import engine.heap.Heap;
+import types.Value;
 
 /**
  * Stores a value from the stack into a local variable.
@@ -17,7 +18,7 @@ public class StoreLocalOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         Map<String, Integer> localVars = callStack.peek().getLocalVars();
         localVars.put(varName, opStack.pop());
     }

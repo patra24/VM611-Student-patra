@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import engine.StackFrame;
 import engine.heap.Heap;
+import types.Value;
 
 /**
  * Loads a constant onto the stack.
@@ -16,7 +17,7 @@ public class LoadConstOp extends Opcode {
     }
 
     @Override
-    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Integer> opStack) {
+    public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         opStack.push(value);
     }
 
