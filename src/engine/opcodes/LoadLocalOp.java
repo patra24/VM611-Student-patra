@@ -19,7 +19,7 @@ public class LoadLocalOp extends Opcode {
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
-        Map<String, Integer> localVars = callStack.peek().getLocalVars();
+        Map<String, Value> localVars = callStack.peek().getLocalVars();
         opStack.push(localVars.get(varName));
     }
 

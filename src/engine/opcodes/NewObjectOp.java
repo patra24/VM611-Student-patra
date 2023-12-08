@@ -23,7 +23,7 @@ public class NewObjectOp extends Opcode {
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         Clazz classDef = CompiledClassCache.instance().resolveClass(className);
         HeapObject newObj = heap.createObject(classDef);
-        opStack.push(newObj.getId());
+        opStack.push(new Value(newObj));
     }
 
     @Override

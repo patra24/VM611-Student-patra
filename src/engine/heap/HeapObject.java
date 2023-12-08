@@ -3,8 +3,11 @@ package engine.heap;
 import java.util.HashMap;
 import java.util.Map;
 
+import engine.exceptions.MissingFieldException;
+import engine.exceptions.UninitializedFieldException;
 import types.Clazz;
 import types.DataType;
+import types.Field;
 import types.Value;
 
 /**
@@ -37,7 +40,16 @@ public class HeapObject extends HeapEntry {
 
     @Override
     public Value getFieldValue(String name) {
-        return fieldValues.get(name);
+        Field field = clazz.getField(name);
+        if (field == null) {
+            throw new MissingFieldException("class " + clazz.getName() + " does not have a field called " + name);
+        }
+
+        Value value = fieldValues.get(name);
+        if (value == null) {
+            throw new UninitializedFieldException(clazz.getName() + "." + name + " read, but not initialized");
+        }
+        return value;
     }
 
     public void setFieldValue(String name, Value value) {

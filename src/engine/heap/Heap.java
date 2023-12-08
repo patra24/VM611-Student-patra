@@ -5,6 +5,7 @@ import java.util.Map;
 
 import types.Clazz;
 import types.DataType;
+import types.Value;
 
 /**
  * Heap stores objects and arrays.
@@ -52,7 +53,13 @@ public class Heap {
     private HeapArray createArray(DataType arrType, int[] dims, int index) {
         HeapArray arr = createHeapArray(arrType, dims[index]);
 
+        // If we're on the innermost array, fill it with zeros, which represent null or
+        // 0.
         if (index == dims.length - 1) {
+            DataType elemType = arrType.getElementType();
+            for (int i = 0; i < dims[index]; i++) {
+                arr.setAt(i, new Value(0, elemType));
+            }
             return arr;
         }
 
@@ -60,7 +67,7 @@ public class Heap {
         DataType subArrType = arrType.getElementType();
         for (int i = 0; i < dims[index]; i++) {
             HeapArray subArr = createArray(subArrType, dims, index + 1);
-            arr.setAt(i, subArr.getId());
+            arr.setAt(i, new Value(subArr));
         }
 
         return arr;

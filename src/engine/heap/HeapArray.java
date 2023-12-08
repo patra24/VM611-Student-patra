@@ -1,5 +1,6 @@
 package engine.heap;
 
+import engine.exceptions.MissingFieldException;
 import types.DataType;
 import types.Value;
 
@@ -61,8 +62,8 @@ public class HeapArray extends HeapEntry {
     @Override
     public Value getFieldValue(String name) {
         if ("length".equals(name)) {
-            return data.length;
+            return new Value(data.length);
         }
-        throw new RuntimeException("Arrays do not have field: " + name);
+        throw new MissingFieldException("Arrays do not have field: " + name);
     }
 }

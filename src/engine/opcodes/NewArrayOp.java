@@ -24,12 +24,12 @@ public class NewArrayOp extends Opcode {
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         int[] dims = new int[numDimensions];
         for (int i = numDimensions - 1; i >= 0; i--) {
-            dims[i] = opStack.pop();
+            dims[i] = opStack.pop().getIntValue();
         }
 
         DataType arrType = new DataType(type, dims.length);
         HeapArray arr = heap.createArray(arrType, dims);
-        opStack.push(arr.getId());
+        opStack.push(new Value(arr));
     }
 
     @Override

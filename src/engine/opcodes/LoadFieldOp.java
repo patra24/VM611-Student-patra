@@ -3,6 +3,7 @@ package engine.opcodes;
 import java.util.Stack;
 
 import engine.StackFrame;
+import engine.exceptions.TypeMismatchException;
 import engine.heap.Heap;
 import engine.heap.HeapEntry;
 import types.Value;
@@ -24,9 +25,12 @@ public class LoadFieldOp extends Opcode {
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
-        int objId = opStack.pop();
-        HeapEntry entry = heap.getEntry(objId);
-        opStack.push(entry.getFieldValue(fieldName));
+        Value objId = opStack.pop();
+        if (!objId.isObject()) {
+            throw new TypeMismatchException("Field access on non-object type: " + objId.getType());
+        }
+        HeapEntry object = (HeapEntry) heap.getEntry(objId.getIntValue());
+        opStack.push(object.getFieldValue(fieldName));
     }
 
     @Override

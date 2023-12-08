@@ -28,8 +28,8 @@ public class BranchOp extends Opcode {
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
         if (type == Type.UNCONDITIONAL ||
         // Only one of these pops will happen, because of short-circuiting.
-            (type == Type.TRUE && opStack.pop() == 1) ||
-            (type == Type.FALSE && opStack.pop() != 1)) {
+            (type == Type.TRUE && opStack.pop().getIntValue() == 1) ||
+            (type == Type.FALSE && opStack.pop().getIntValue() != 1)) {
             callStack.peek().jumpTo(dest);
         }
     }

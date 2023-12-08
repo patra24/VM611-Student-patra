@@ -18,7 +18,7 @@ public class LoadConstOp extends Opcode {
 
     @Override
     public void execute(Stack<StackFrame> callStack, Heap heap, Stack<Value> opStack) {
-        opStack.push(value);
+        opStack.push(new Value(value));
     }
 
     @Override
