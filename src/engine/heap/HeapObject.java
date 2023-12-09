@@ -1,5 +1,6 @@
 package engine.heap;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +55,11 @@ public class HeapObject extends HeapEntry {
 
     public void setFieldValue(String name, Value value) {
         fieldValues.put(name, value);
+    }
+
+    @Override
+    public Collection<Value> getReferencedValues() {
+        return null;
     }
 
 }

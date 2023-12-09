@@ -1,5 +1,7 @@
 package engine.heap;
 
+import java.util.Collection;
+
 import engine.exceptions.MissingFieldException;
 import types.DataType;
 import types.Value;
@@ -65,5 +67,10 @@ public class HeapArray extends HeapEntry {
             return new Value(data.length);
         }
         throw new MissingFieldException("Arrays do not have field: " + name);
+    }
+
+    @Override
+    public Collection<Value> getReferencedValues() {
+        return null;
     }
 }

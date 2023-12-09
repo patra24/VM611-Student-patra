@@ -2,7 +2,10 @@ package engine.heap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
+import engine.StackFrame;
 import types.Clazz;
 import types.DataType;
 import types.Value;
@@ -78,5 +81,16 @@ public class Heap {
         entries.put(nextId, arr);
         nextId++;
         return arr;
+    }
+
+    /**
+     * Deletes unreferenced objects from the heap.
+     *
+     * @param callStack the callStack
+     * @param opStack   the opStack
+     * @return the object ids that were deleted
+     */
+    public Set<Integer> gc(Stack<StackFrame> callStack, Stack<Value> opStack) {
+        return null;
     }
 }

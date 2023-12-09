@@ -1,5 +1,7 @@
 package engine.heap;
 
+import java.util.Collection;
+
 import types.DataType;
 import types.Value;
 
@@ -37,4 +39,11 @@ public abstract class HeapEntry {
      * @return the value
      */
     public abstract Value getFieldValue(String name);
+
+    /**
+     * Returns a collection of values that are referenced by this object.
+     * 
+     * @return the collection
+     */
+    public abstract Collection<Value> getReferencedValues();
 }
