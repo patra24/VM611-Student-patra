@@ -1,5 +1,6 @@
 package engine.heap;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import engine.exceptions.MissingFieldException;
@@ -71,6 +72,6 @@ public class HeapArray extends HeapEntry {
 
     @Override
     public Collection<Value> getReferencedValues() {
-        return null;
+        return Arrays.asList(data);
     }
 }

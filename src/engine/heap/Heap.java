@@ -1,9 +1,14 @@
 package engine.heap;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import engine.StackFrame;
 import types.Clazz;
@@ -83,6 +88,20 @@ public class Heap {
         return arr;
     }
 
+    private void addObjectReferences(Queue<Integer> q, Set<Integer> seen, Collection<Value> values) {
+        for (Value v : values) {
+            if (!v.isObject()) {
+                continue;
+            }
+
+            int objId = v.getIntValue();
+            if (!seen.contains(objId)) {
+                q.add(objId);
+                seen.add(objId);
+            }
+        }
+    }
+
     /**
      * Deletes unreferenced objects from the heap.
      *
@@ -91,6 +110,34 @@ public class Heap {
      * @return the object ids that were deleted
      */
     public Set<Integer> gc(Stack<StackFrame> callStack, Stack<Value> opStack) {
-        return null;
+        Set<Integer> seen = new HashSet<>();
+        Queue<Integer> q = new LinkedList<>();
+
+        // Add references from opStack and callStack to q.
+        addObjectReferences(q, seen, opStack);
+
+        for (StackFrame frame : callStack) {
+            addObjectReferences(q, seen, frame.getLocalVars().values());
+        }
+
+        // Follow the graph of references to all reachable objects.
+        while (!q.isEmpty()) {
+            int objId = q.remove();
+
+            HeapEntry entry = entries.get(objId);
+            if (entry != null) {
+                addObjectReferences(q, seen, entry.getReferencedValues());
+            }
+        }
+
+        // Delete all objects that were not reachable.
+        Set<Integer> deleted = entries.values().stream()
+            .map(HeapEntry::getId)
+            .filter(id -> !seen.contains(id))
+            .collect(Collectors.toSet());
+
+        deleted.forEach(id -> entries.remove(id));
+
+        return deleted;
     }
 }

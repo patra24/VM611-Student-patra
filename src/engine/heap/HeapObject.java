@@ -59,7 +59,7 @@ public class HeapObject extends HeapEntry {
 
     @Override
     public Collection<Value> getReferencedValues() {
-        return null;
+        return fieldValues.values();
     }
 
 }
