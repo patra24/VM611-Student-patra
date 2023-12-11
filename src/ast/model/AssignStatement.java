@@ -16,6 +16,7 @@ public class AssignStatement extends Statement {
      * @param value  the value
      */
     public AssignStatement(Expression lvalue, Expression value) {
+        lvalue.setLValue(true);
         this.lValue = lvalue;
         this.value = value;
     }

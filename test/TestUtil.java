@@ -14,7 +14,9 @@ import ast.model.Expression;
 import ast.model.FieldDefinition;
 import ast.model.MethodDefinition;
 import ast.model.Statement;
+import ast.visitors.CloneVisitor;
 import ast.visitors.CompileVisitor;
+import ast.visitors.OptimizingVisitor;
 import ast.visitors.PrintVisitor;
 import ast.visitors.Visitable;
 import engine.CompiledClassCache;
@@ -332,5 +334,36 @@ public class TestUtil {
     public static void testCompileStatement(String code, String expectedDisassembly) {
         Statement s = testParseStatement(code);
         testCompileAST(s, expectedDisassembly);
+    }
+
+    /**
+     * Checks optimization.
+     * 
+     * @param code         input code
+     * @param expectedCode code after optimization
+     */
+    public static void checkOptimization(String code, String expectedCode) {
+        MethodDefinition method = new Parser(code).parseMethod();
+        CloneVisitor cv = new CloneVisitor();
+        method.accept(cv);
+        PrintVisitor pv = new PrintVisitor();
+        method.accept(pv);
+        assertEquals("clone failed", code, pv.getResult());
+
+        while (true) {
+            OptimizingVisitor ov = new OptimizingVisitor();
+            method.accept(ov);
+            pv = new PrintVisitor();
+            method.accept(pv);
+            String newCode = pv.getResult();
+
+            if (newCode.equals(code)) {
+                break;
+            }
+
+            code = newCode;
+        }
+
+        assertEquals("optimization failed", expectedCode, pv.getResult());
     }
 }

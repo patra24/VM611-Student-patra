@@ -38,6 +38,10 @@ public class MethodDefinition implements Visitable {
         return body;
     }
 
+    public void setBody(CompoundStatement body) {
+        this.body = body;
+    }
+
     @Override
     public void accept(Visitor v) {
         v.preVisit(this);
